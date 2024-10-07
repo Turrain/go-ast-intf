@@ -28,7 +28,7 @@ interface ChatStoreState {
 }
 
 // Initialize the Ollama API
-const ollamaAPI = new OllamaAPI("http://192.168.25.63:11434");
+const ollamaAPI = new OllamaAPI("http://82.200.169.182:11434");
 
 // Helper to generate unique IDs for messages and sessions
 const generateId = () => Math.random().toString(36).substring(7);
@@ -124,7 +124,7 @@ const useChatStore = create<ChatStoreState>((set, get) => ({
   
     try {
       // Call the Ollama API to get a response
-      const response = await fetch("http://192.168.25.63:11434/api/chat", {
+      const response = await fetch("http://82.200.169.182:11434/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

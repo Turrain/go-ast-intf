@@ -72,7 +72,7 @@ const AbstractComponent: React.FC<AbstractComponentProps> = ({
           <Input
             sx={{ width: inputWidth }}
             variant={inputVariant}
-            size={inputSize}
+            size="sm"
             type={inputType}
             value={value}
             step={inputStep}
@@ -80,6 +80,7 @@ const AbstractComponent: React.FC<AbstractComponentProps> = ({
             onChange={handleInputChange}
           />
           <Slider
+            size='sm'
             aria-label="Slider"
             value={value}
             step={sliderStep}

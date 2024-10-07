@@ -9,13 +9,16 @@ import {
     List,
     ListItem,
     ListItemButton,
+    Sheet,
     Stack,
+    Textarea,
     TextField,
     Typography,
 } from "@mui/joy";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { Mic, Send } from "@mui/icons-material";
 const ChatApp = () => {
     const {
         sessions,
@@ -48,8 +51,8 @@ const ChatApp = () => {
     return (
         <Box display="flex" height="100vh">
             {/* Sidebar for switching between sessions */}
-            <Box width="200px" p={2} borderRight="1px solid #ccc">
-            <Button onClick={handleNewChat} variant="solid" fullWidth>
+            <Sheet sx={{p:2, width:'250px'}}  >
+                <Button onClick={handleNewChat} variant="solid" fullWidth>
                     New Chat
                 </Button>
                 <List>
@@ -58,7 +61,8 @@ const ChatApp = () => {
                             key={session.id}
                             onClick={() => switchSession(session.id)}
                             component="li"
-                            sx={{ backgroundColor: session.id === currentSessionId ? 'background.surface' : 'inherit' }}
+
+                            sx={{borderRadius:'8px', backgroundColor: session.id === currentSessionId ? 'background.level1' : 'inherit' }}
                         >
                             <ListItemButton>
                                 <Typography  > {`Chat ${session.title}`} </Typography>
@@ -66,12 +70,12 @@ const ChatApp = () => {
                         </ListItem>
                     ))}
                 </List>
-               
-            </Box>
+
+            </Sheet>
 
             {/* Chat window */}
 
-            <Box flex={1} p={1} display="flex" flexDirection="column">
+            <Box flex={1}  display="flex" flexDirection="column">
 
 
 
@@ -80,8 +84,8 @@ const ChatApp = () => {
                         {currentSession?.messages.map((message) => (
 
                             <Box key={message.id} mb={2} sx={{ alignSelf: message.role === "user" ? "end" : "start" }}>
-                                <Typography level="body-md">
-                                    {message.role === "user" ? "You" : "Assistant"}:
+                                <Typography level="body-xs" sx={{mb: 0.325, textAlign: message.role === "user" ? "end" : "start"}}>
+                                    {message.role === "user" ? "You" : "Assistant"}
                                 </Typography>
                                 <Box
                                     sx={{
@@ -123,19 +127,23 @@ const ChatApp = () => {
                 </Box>
 
                 {/* Input box for the current chat session */}
-                <Box p={2} borderTop="1px solid #ccc" display="flex" alignItems="center">
-                    <Input
-
+                <Sheet sx={{display: 'flex', p:1,}} >
+                    <Textarea
+                        variant="soft"
                         value={currentSession?.input || ""}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Type a message..."
                         disabled={loading}
-                        fullWidth
+                        sx={{ flex: 1 }}
+                        
                     />
-                    <Button onClick={handleSendMessage} disabled={loading || !currentSession?.input} variant="contained" sx={{ ml: 2 }}>
-                        Send
+                    <Button color="primary" variant="plain" sx={{m:0, px:1}}>
+                        <Mic/>
                     </Button>
-                </Box>
+                    <Button onClick={handleSendMessage} disabled={loading || !currentSession?.input} color="primary" variant="plain" >
+                        <Send/>
+                    </Button>
+                </Sheet>
 
                 {loading && <Typography p={2}>Loading assistant response...</Typography>}
             </Box>
