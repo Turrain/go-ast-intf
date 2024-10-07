@@ -19,6 +19,7 @@ import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Mic, Send } from "@mui/icons-material";
+import VadTest from "./VadTest";
 const ChatApp = () => {
     const {
         sessions,
@@ -78,7 +79,7 @@ const ChatApp = () => {
             <Box flex={1}  display="flex" flexDirection="column">
 
 
-
+                    <VadTest/>
                 <Box flex={1} p={2} overflow="auto" sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         {currentSession?.messages.map((message) => (
