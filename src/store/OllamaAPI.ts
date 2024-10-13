@@ -1,4 +1,7 @@
 // Define the class for interacting with the Ollama API
+
+
+
 class OllamaAPI {
   private apiUrl: string;
 

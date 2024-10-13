@@ -4,17 +4,22 @@ import Option from '@mui/joy/Option';
 import CircularProgress from '@mui/joy/CircularProgress';
 import { Stack, Typography } from '@mui/joy';
 
-const SelectLLMModel: React.FC = () => {
+
+interface SelectLLMModelProps {
+    selectedModel: string | null;
+    onModelChange: (model: string | null) => void;
+}
+
+const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelChange }) => {
     const [models, setModels] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchModels = async () => {
             try {
-                const response = await fetch('http://192.168.25.63:11434/api/tags');
+                const response = await fetch('http://82.200.169.182:11434/api/tags');
                 const data = await response.json();
-                const modelNames = data.models.map((model: { name: string }) => model.name);  // Extract the model names
+                const modelNames = data.models.map((model: { name: string }) => model.name);
                 setModels(modelNames);
             } catch (error) {
                 console.error('Error fetching models:', error);
@@ -27,7 +32,7 @@ const SelectLLMModel: React.FC = () => {
     }, []);
 
     const handleChange = (event: any, newValue: string | null) => {
-        setSelectedModel(newValue);
+        onModelChange(newValue);
     };
 
     return (
@@ -36,19 +41,19 @@ const SelectLLMModel: React.FC = () => {
                 <CircularProgress />
             ) : (
                 <Stack>
-                <Typography level='body-xs'>Select a model:</Typography>
-                <Select
-                size='sm'
-                    placeholder="Select a model"
-                    value={selectedModel}
-                    onChange={handleChange}
-                >
-                    {models.map((model) => (
-                        <Option key={model} value={model}>
-                            {model}
-                        </Option>
-                    ))}
-                </Select>
+                    <Typography level='body-xs'>Select a model:</Typography>
+                    <Select
+                        size='sm'
+                        placeholder="Select a model"
+                        value={selectedModel}
+                        onChange={handleChange}
+                    >
+                        {models.map((model) => (
+                            <Option key={model} value={model}>
+                                {model}
+                            </Option>
+                        ))}
+                    </Select>
                 </Stack>
             )}
         </div>
