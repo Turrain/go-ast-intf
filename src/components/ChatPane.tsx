@@ -14,6 +14,7 @@ import {
     ListItemButton,
     ListItem,
     ListItemContent,
+    tabClasses,
 } from "@mui/joy";
 import { Delete } from "@mui/icons-material";
 import { useStore } from "../store/ChatStore";
@@ -23,6 +24,7 @@ import STTForm from "./Settings/STTForm";
 import LLMForm from "./Settings/LLMForm";
 import AsteriskForm from "./Settings/AsteriskForm";
 import { Chat } from "../types/types";
+import ColorSchemeToggle from "./ColorSchemeToggle";
 
 const ChatPane: FC = () => {
     const chats = useStore((state) => state.chats);
@@ -53,30 +55,45 @@ const ChatPane: FC = () => {
                 display: 'flex',
                 flexDirection: 'row',
                 minHeight: '100vh',
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                scrollBehavior: 'smooth',
                 gap: 1,
             }}
         >
             <Sheet
                 sx={{
-                    minWidth: '250px',
+                    minWidth: { xs: '100dvw', md: '350px' },
+                    width: { xs: '100dvw', md: '350px' },
                     height: '100vh',
+                    scrollSnapAlign: 'start',
+                  
                     overflowY: 'auto',
                     borderRight: '1px solid',
                     borderColor: 'divider',
                 }}
             >
-                <Button
-                    onClick={() => addChat()}
-                    fullWidth
-                    variant="outlined"
-                    sx={{ mt: 2 }}
-                >
-                    New Chat
-                </Button>
-                <List>
+                <Box sx={{ px: 2, display: 'flex', flexDirection: 'row', gap: 1 }}>
+                    <Button
+                        onClick={() => addChat()}
+                        fullWidth
+                        color="primary"
+                        variant="plain"
+                        sx={{ mt: 2, mb: 1, backgroundColor: 'background.level1', borderRadius: '18px', boxShadow: 'sm'}}
+                    >
+                        New Chat
+                    </Button>
+                    <ColorSchemeToggle sx={{ mt: 2, mb: 1, borderRadius: '50%', px: 1.25, boxShadow: 'sm' }} />
+                </Box>
+
+                <List sx={{ px: 2, gap: 1 }}>
                     {chats.map((chat: Chat) => (
                         <ListItem key={chat.id}>
                             <ListItemButton
+                                sx={{
+                                    backgroundColor: 'background.surface',
+                                    borderRadius: '18px',
+                                }}
                                 onClick={() => selectChat(chat.id)}
                                 selected={chat.id === currentChat}
                             >
@@ -101,9 +118,35 @@ const ChatPane: FC = () => {
                     ))}
                 </List>
             </Sheet>
-            <Stack sx={{ flex: 1, width: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-                <Box 
-                    sx={{ flex: 1, p: 2, width: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
+            <Stack sx={{
+                flex: 1,
+                scrollSnapAlign: 'start',
+                minWidth: {xs: '100dvw', md: 'unset'},
+                width: {xs: '100dvw', md: '100%'},
+                px: 4,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Box
+                    sx={{
+                        flex: 1,
+                        p: 2,
+                        width: '100%',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        '&::-webkit-scrollbar': {
+                            width: '3px', // Set the scrollbar width
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: '#888', // Set the scrollbar thumb color
+                            borderRadius: '10px', // Optional: round the scrollbar thumb
+                        },
+                        '&::-webkit-scrollbar-thumb:hover': {
+                            backgroundColor: '#555', // Change color on hover
+                        },
+                    }}
                     ref={(el) => {
                         if (el) {
                             // Ensure el is of type HTMLElement
@@ -124,25 +167,37 @@ const ChatPane: FC = () => {
                 id="Settings"
                 sx={{
                     height: "100vh",
-                    minWidth: "350px",
-                    scrollSnapAlign: "start",
-                    p: 2,
+                    scrollSnapAlign: 'start',
+                    width: {xs: '100dvw', md: '350px'},
+                    minWidth: {xs: '100dvw', md: '350px'},
+                  
+                    px: 2,
                 }}
             >
-                <Button
+                {/* <Button
                     onClick={() => saveSettingsChat(getCurrentChatId(chats))}
                     variant="solid"
                     fullWidth
                     sx={{ mb: 2 }}
                 >
                     Save Settings
-                </Button>
-                <Tabs aria-label="Settings Tabs" size="sm" defaultValue={0}>
-                    <TabList tabFlex="auto">
-                        <Tab>STT</Tab>
-                        <Tab>LLM</Tab>
-                        <Tab>TTS</Tab>
-                        <Tab>Asterisk</Tab>
+                </Button> */}
+                <Tabs aria-label="Settings Tabs" size="sm" defaultValue={0} sx={{ bgcolor: 'transparent' }}>
+                    <TabList disableUnderline={true} tabFlex="auto" sx={{
+                        mt:2,   
+                        p: 0.5,
+                        gap: 0.5,
+                        borderRadius: 'xl',
+                        bgcolor: 'background.level1',
+          [`& .${tabClasses.root}[aria-selected="true"]`]: {
+            boxShadow: 'sm',
+            bgcolor: 'background.surface',
+          },
+        }}>
+                        <Tab disableIndicator>STT</Tab>
+                        <Tab disableIndicator>LLM</Tab>
+                        <Tab disableIndicator>TTS</Tab>
+                        <Tab disableIndicator>Asterisk</Tab>
                         {/* Add more tabs if necessary */}
                     </TabList>
                     <TabPanel value={0}>

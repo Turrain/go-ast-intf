@@ -1,5 +1,6 @@
 import React, { useState, FC, FormEvent } from 'react';
-import { Box, Textarea, Button } from '@mui/joy';
+import { Box, Textarea, Button, Stack } from '@mui/joy';
+import { Send } from '@mui/icons-material';
 
 interface ChatInputProps {
     onSend: (content: string) => Promise<void>;
@@ -16,20 +17,24 @@ const ChatInput: FC<ChatInputProps> = ({ onSend }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{  }}>
+            <Stack direction="row" sx={{alignItems: 'center', mb: 2, gap:2}}>
             <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Type your message..."
-                minRows={2}
+                minRows={1}
                 maxRows={6}
-                variant="outlined"
+                variant="plain"
                 fullWidth
-                sx={{ mb: 2 }}
+                sx={{  flex: 1, borderRadius: '18px', backgroundColor: 'background.surface' }}
+                
             />
-            <Button type="submit" variant="solid" fullWidth>
-                Send
+            <Button type="submit" variant="solid" sx={{ p:0,m:0, px: 1,borderRadius: '50%'}} >
+                <Send fontSize="small" />
             </Button>
+            </Stack>
+           
         </Box>
     );
 };

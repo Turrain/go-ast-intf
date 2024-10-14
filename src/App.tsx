@@ -14,7 +14,7 @@ function App() {
       <CssVarsProvider disableTransitionOnChange>
         <CssBaseline />
         <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
-          <Sidebar />
+          {/* <Sidebar /> */}
           <Box
             component="main"
             className="MainContent"

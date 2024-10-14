@@ -12,7 +12,7 @@ interface LLMFormProps {
 
 const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
     <form>
-        <Typography level="body-xs">Selected Model: {settings.model || "Default Model"}</Typography>
+        <Typography level="body-xs" sx={{ mb: 1 }}>Selected Model: {settings.model || "Default Model"}</Typography>
         <SelectLLMModel
             selectedModel={settings.model}
             onModelChange={(val) => onSettingsChange("model", val)}
@@ -37,7 +37,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
                     />
                 </Tooltip>
             </Box>
-            {settings.system_prompt !== null ? (
+            {settings.system_prompt !== null && (
                 <Textarea
                     minRows={4}
                     size="sm"
@@ -49,11 +49,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
                     }
                     sx={{ mb: 2 }}
                 />
-            ) : (
-                <Typography level="body-xs" fontWeight="400">
-                    System Prompt is disabled.
-                </Typography>
-            )}
+            ) }
         </Box>
         {[
             "mirostat",
@@ -69,7 +65,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             "top_p",
             "min_p",
         ].map((setting) => (
-            <Box key={setting} sx={{ mb: 0.5, width: '100%', display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
+            <Box key={setting} sx={{ mb: 1, width: '100%', display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
 
 
                 <SliderWithInput

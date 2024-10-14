@@ -67,15 +67,19 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
                  minWidth: '30%'
             }}
         >
+            <Stack  sx={{mb: 0.5, display: 'flex', gap:1, alignItems: 'center', flexDirection: message.role === Sender.User ? 'row-reverse' : 'row'}}>
             <Typography
                 level="body-xs"
                 sx={{
-                    mb: 0.325,
+                
                     textAlign: message.role === Sender.User ? "end" : "start",
                 }}
             >
                 {message.role === Sender.User ? "User" : "Assistant"}
             </Typography>
+            <Typography level="body-xs" sx={{ textAlign: 'end',  }}>{new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</Typography>
+            </Stack>
+           
             <Box
                 sx={{
                     backgroundColor: "background.surface",
@@ -135,14 +139,16 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
                             }}
                         >
                             {message.content}
+                          
                         </Markdown>
+                        
                     </Typography>
                 )}
                 {/* {message.audioURL && (
                     <CustomAudioPlayer src={message.audioURL} />
                 )} */}
             </Box>
-         
+          
             <Box sx={{ mt: 0.5, ml: 1, opacity: 0, transition: 'opacity 0.3s', '&:hover': { opacity: 1 } }}>
                 <Stack direction="row" spacing={0}>
                     {!isEditing && (

@@ -42,12 +42,14 @@ const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelC
                 <CircularProgress />
             ) : (
                 <Stack>
-                    <Typography level='body-xs'>Select a model:</Typography>
+                    
                     <Select
                         size='sm'
                         placeholder="Select a model"
                         value={selectedModel || ""}
                         onChange={handleChange}
+                        variant='plain'
+                        sx={{borderRadius: '18px', boxShadow: 'sm'}}
                     >
                         {models.map((model) => (
                             <Option key={model} value={model}>

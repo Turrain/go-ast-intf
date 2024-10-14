@@ -28,7 +28,8 @@ export default function ColorSchemeToggle(props: IconButtonProps) {
     <IconButton
       data-screenshot="toggle-mode"
       size="sm"
-      variant="outlined"
+      variant="plain"
+      
       color="neutral"
       {...other}
       onClick={(event) => {
