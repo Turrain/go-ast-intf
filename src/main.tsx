@@ -7,7 +7,7 @@ import { StyledEngineProvider } from '@mui/joy';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <StyledEngineProvider injectFirst>
+    <StyledEngineProvider injectFirst >
       <App />
     </StyledEngineProvider>
     

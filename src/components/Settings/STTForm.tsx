@@ -1,25 +1,25 @@
 import React, { FC } from "react";
 import { Typography } from "@mui/joy";
 import SliderWithInput from "../SliderWithInput";
+import { STTSettings } from "../../store/ChatAPI";
 
 interface STTFormProps {
     settings: Settings;
     onSettingsChange: (name: string, value: number | string) => void;
 }
-
 interface Settings {
-    whisper_beam_size: number;
-    whisper_beam_size_enabled: boolean;
-    whisper_best_of: number;
-    whisper_best_of_enabled: boolean;
-    whisper_patience: number;
-    whisper_patience_enabled: boolean;
-    whisper_no_speech_threshold: number;
-    whisper_no_speech_threshold_enabled: boolean;
-    whisper_temperature: number;
-    whisper_temperature_enabled: boolean;
-    whisper_hallucination_silence_threshold: number;
-    whisper_hallucination_silence_threshold_enabled: boolean;
+    beam_size: number;
+    beam_size_enabled: boolean;
+    best_of: number;
+    best_of_enabled: boolean;
+    patience: number;
+    patience_enabled: boolean;
+    no_speech_threshold: number;
+    no_speech_threshold_enabled: boolean;
+    temperature: number;
+    temperature_enabled: boolean;
+    hallucination_silence_threshold: number;
+    hallucination_silence_threshold_enabled: boolean;
 }
 
 const STTForm: FC<STTFormProps> = ({ settings, onSettingsChange }) => (
@@ -28,16 +28,16 @@ const STTForm: FC<STTFormProps> = ({ settings, onSettingsChange }) => (
             FASTER-WHISPER-LARGE-V3
         </Typography>
         {[
-            "whisper_beam_size",
-            "whisper_best_of",
-            "whisper_patience",
-            "whisper_no_speech_threshold",
-            "whisper_temperature",
-            "whisper_hallucination_silence_threshold",
+            "beam_size",
+            "best_of",
+            "patience",
+            "no_speech_threshold",
+            "temperature",
+            "hallucination_silence_threshold",
         ].map((setting) => (
             <SliderWithInput
                 key={setting}
-                label={setting.replace("whisper_", "").replace("_", " ")}
+                label={setting.replace("", "").replace("_", " ")}
                 inputName={setting}
                 value={settings[setting]}
                 enabled={settings[`${setting}_enabled`]}

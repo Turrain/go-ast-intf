@@ -1,7 +1,5 @@
 import React, { FC } from "react";
-import { Sheet, Textarea, Button } from "@mui/joy";
-import { Send } from "@mui/icons-material";
-import VadTest from "./VadTest";
+import { Box, Input, Button } from "@mui/joy";
 
 interface ChatInputProps {
     messageContent: string;
@@ -9,36 +7,36 @@ interface ChatInputProps {
     handleSendMessage: () => void;
 }
 
-const ChatInput: FC<ChatInputProps> = React.memo(
-    ({ messageContent, setMessageContent, handleSendMessage }) => (
-        <Sheet sx={{ display: "flex", p: 1 }}>
-            <Textarea
-                variant="soft"
+const ChatInput: FC<ChatInputProps> = ({ messageContent, setMessageContent, handleSendMessage }) => {
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
+
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                gap: 1,
+                p: 2,
+                borderTop: "1px solid #ccc",
+            }}
+        >
+            <Input
+                placeholder="Type your message..."
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
-                placeholder="Type a message..."
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }
-                }}
-                sx={{ flex: 1, mr: 1 }}
+                onKeyPress={handleKeyPress}
+                fullWidth
+                multiline
             />
-            <VadTest
-                onTranscribe={(message, audioURL) =>
-                    console.log(message, audioURL)
-                }
-            />
-            <Button
-                onClick={handleSendMessage}
-                color="primary"
-                variant="plain"
-            >
-                <Send />
+            <Button onClick={handleSendMessage} variant="solid">
+                Send
             </Button>
-        </Sheet>
-    )
-);
+        </Box>
+    );
+};
 
 export default ChatInput;

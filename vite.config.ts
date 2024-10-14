@@ -8,6 +8,9 @@ export default defineConfig({
     exclude: ['ort-wasm-simd-threaded'],
   },
   base: './',
+  build: {
+    outDir: 'build'
+  },
   plugins: [react(),
     viteStaticCopy({
       targets: [

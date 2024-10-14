@@ -49,7 +49,7 @@
             onChange,
             onToggleEnabled,
         }) => {
-            const [expanded, setExpanded] = useState<boolean>(false);
+       
 
             const handleInputChange = useCallback(
                 (event: ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +80,7 @@
                 (event: ChangeEvent<HTMLInputElement>) => {
                     console.log("handleToggleEnabled", event.target.checked);
                     onToggleEnabled(inputName, event.target.checked);
-                    setExpanded((prev) => !prev);
+                  
                 },
                 [onToggleEnabled, inputName]
             );
@@ -103,7 +103,7 @@
                             />
                         </Stack>
                     </Stack>
-                    {expanded && enabled && (
+                    {enabled && (
                         <Stack
                             direction={stackDirection}
                             gap={stackGap}

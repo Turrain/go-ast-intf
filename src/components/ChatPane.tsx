@@ -15,134 +15,50 @@ import {
     Stack,
 } from "@mui/joy";
 import { Delete } from "@mui/icons-material";
-import ChatAPI, { Chat,  User } from "../store/ChatAPI";
+import ChatAPI, { Chat, User, Sender, Message, LLMSettings, STTSettings } from "../store/ChatAPI";
 import SliderWithInput from "./SliderWithInput";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import STTForm from "./Settings/STTForm";
 import LLMForm from "./Settings/LLMForm";
 import AsteriskForm from "./Settings/AsteriskForm";
+import OllamaAPI from "../store/OllamaAPI";
 
 interface Settings {
-    whisper_beam_size: number;
-    whisper_beam_size_enabled: boolean;
-    whisper_best_of: number;
-    whisper_best_of_enabled: boolean;
-    whisper_patience: number;
-    whisper_patience_enabled: boolean;
-    whisper_no_speech_threshold: number;
-    whisper_no_speech_threshold_enabled: boolean;
-    whisper_temperature: number;
-    whisper_temperature_enabled: boolean;
-    whisper_hallucination_silence_threshold: number;
-    whisper_hallucination_silence_threshold_enabled: boolean;
-    llm_system_prompt: string;
-    llm_system_prompt_enabled: boolean;
-    llm_mirostat: number;
-    llm_mirostat_enabled: boolean;
-    llm_mirostat_eta: number;
-    llm_mirostat_eta_enabled: boolean;
-    llm_mirostat_tau: number;
-    llm_mirostat_tau_enabled: boolean;
-    llm_num_ctx: number;
-    llm_num_ctx_enabled: boolean;
-    llm_repeat_last_n: number;
-    llm_repeat_last_n_enabled: boolean;
-    llm_repeat_penalty: number;
-    llm_repeat_penalty_enabled: boolean;
-    llm_temperature: number;
-    llm_temperature_enabled: boolean;
-    llm_tfs_z: number;
-    llm_tfs_z_enabled: boolean;
-    llm_num_predict: number;
-    llm_num_predict_enabled: boolean;
-    llm_top_k: number;
-    llm_top_k_enabled: boolean;
-    llm_top_p: number;
-    llm_top_p_enabled: boolean;
-    llm_min_p: number;
-    llm_min_p_enabled: boolean;
-    asterisk_min_audio_length: number;
-    asterisk_min_audio_length_enabled: boolean;
-    asterisk_silence_threshold: number;
-    asterisk_silence_threshold_enabled: boolean;
-    asterisk_host: string;
-    asterisk_host_enabled: boolean;
-    asterisk_number: string;
-    asterisk_number_enabled: boolean;
-    model: string;
-    model_enabled: boolean;
+    sttSettings: STTSettings;
+    llmSettings: LLMSettings;
+    ttsSettings: {};
+    // Add other global settings if necessary
 }
 
 const ChatApp: FC = () => {
     const [defaultUser, setDefaultUser] = useState<User | null>(null);
     const [chats, setChats] = useState<Chat[]>([]);
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [messageContent, setMessageContent] = useState<string>("");
     const [currentChatId, setCurrentChatId] = useState<string>("");
-    const [settings, setSettings] = useState<Settings>({
-        whisper_beam_size: 1,
-        whisper_beam_size_enabled: true,
-        whisper_best_of: 1,
-        whisper_best_of_enabled: true,
-        whisper_patience: 1,
-        whisper_patience_enabled: true,
-        whisper_no_speech_threshold: 1,
-        whisper_no_speech_threshold_enabled: true,
-        whisper_temperature: 1,
-        whisper_temperature_enabled: true,
-        whisper_hallucination_silence_threshold: 1,
-        whisper_hallucination_silence_threshold_enabled: true,
-        llm_system_prompt: "",
-        llm_system_prompt_enabled: true,
-        llm_mirostat: 1,
-        llm_mirostat_enabled: true,
-        llm_mirostat_eta: 0.2,
-        llm_mirostat_eta_enabled: true,
-        llm_mirostat_tau: 0.2,
-        llm_mirostat_tau_enabled: true,
-        llm_num_ctx: 4096,
-        llm_num_ctx_enabled: true,
-        llm_repeat_last_n: 64,
-        llm_repeat_last_n_enabled: true,
-        llm_repeat_penalty: 1.2,
-        llm_repeat_penalty_enabled: true,
-        llm_temperature: 0.7,
-        llm_temperature_enabled: true,
-        llm_tfs_z: 0.1,
-        llm_tfs_z_enabled: true,
-        llm_num_predict: 60,
-        llm_num_predict_enabled: true,
-        llm_top_k: 50,
-        llm_top_k_enabled: true,
-        llm_top_p: 0.85,
-        llm_top_p_enabled: true,
-        llm_min_p: 0.05,
-        llm_min_p_enabled: true,
-        asterisk_min_audio_length: 0.5,
-        asterisk_min_audio_length_enabled: true,
-        asterisk_silence_threshold: 5,
-        asterisk_silence_threshold_enabled: true,
-        asterisk_host: "",
-        asterisk_host_enabled: true,
-        asterisk_number: "",
-        asterisk_number_enabled: true,
-        model: "gemma2:9b",
-        model_enabled: true,
+    const [settings, setSettings] = useState<any>({
+        sttSettings: {},
+        llmSettings: {},
+        ttsSettings: {},
+        // Initialize other settings as needed
     });
-
+    
     // Initialize API Client
-    const apiClient = new ChatAPI("http://localhost:8009");
+    const apiClient = new ChatAPI("http://localhost:8009/api");
+    const ollamaClient = new OllamaAPI("http://localhost:8009/api");
 
     // Load default user and chats on mount
     useEffect(() => {
         const loadDefaultUser = async () => {
             try {
                 const users = await apiClient.listUsers();
-                const user =
-                    users.find((u) => u.email === "default@example.com") ||
-                    null;
+                console.log(users);
+
+                const user = users.find((u) => u.email === "default@example.com") || null;
+                console.log("User:", user);
                 setDefaultUser(user);
+                console.log("Default user:", user);
             } catch (error) {
                 console.error("Failed to load default user:", error);
             }
@@ -166,63 +82,59 @@ const ChatApp: FC = () => {
         loadDefaultUser();
         loadChats();
     }, []);
+
     const handleGeneration = useCallback(
         async (msgs: Message[]) => {
             try {
                 const userMessages = [
-                    { content: settings.llm_system_prompt, role: "system" },
-                    ...msgs.map(({ content, sender }) => ({
+                    { content: settings.llmSettings.system_prompt || "", role: "system" as Sender },
+                    ...msgs.map(({ content, role }) => ({
                         content,
-                        role: sender,
+                        role,
                     })),
                 ];
 
                 // Extract only enabled settings
                 const ollamaSettings: Record<string, number | string> = {};
 
-                Object.keys(settings).forEach((key) => {
-                    if (key.endsWith("_enabled") && (settings as any)[key]) {
+                Object.keys(settings.llmSettings).forEach((key) => {
+                    if (key.endsWith("_enabled") && (settings.llmSettings as any)[key]) {
                         const settingKey = key.replace("_enabled", "");
-                        if (
-                            settingKey !== "model" &&
-                            (settings as any)[settingKey] !== undefined
-                        ) {
-                            const skey = settingKey.replace(/^llm_/, "");
-                            ollamaSettings[skey] =
-                                (settings as any)[settingKey];
+                        if ((settings.llmSettings as any)[settingKey] !== undefined) {
+                            ollamaSettings[settingKey] = (settings.llmSettings as any)[settingKey];
                         }
                     }
                 });
 
                 console.log("Enabled Settings:", ollamaSettings);
-                console.log("Selected Model:", settings.model);
+                console.log("Selected Model:", settings.llmSettings.model || "default-model");
 
-                const response = await fetch(
-                    "http://82.200.169.182:11434/api/chat",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            model: settings.model,
-                            messages: userMessages,
-                            stream: false,
-                            options: ollamaSettings,
-                        }),
-                    }
-                );
+                const response = await ollamaClient.chat({
+                    model: settings.llmSettings.model || "gemma2:9b",
+                    messages: userMessages,
+                    stream: false,
+                    options: ollamaSettings,
+                });
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch from API");
-                }
-
-                const assistantResponse = await response.json();
+                console.log("Response from Ollama Client:", response);
+                const assistantResponse = {
+                    model: response.model,
+                    created_at: response.created_at,
+                    message: response.message,
+                    done_reason: response.done_reason,
+                    done: response.done,
+                    total_duration: response.total_duration,
+                    load_duration: response.load_duration,
+                    prompt_eval_count: response.prompt_eval_count,
+                    prompt_eval_duration: response.prompt_eval_duration,
+                    eval_count: response.eval_count,
+                    eval_duration: response.eval_duration
+                };
                 console.log("Assistant Response:", assistantResponse);
 
                 const newMessage = await apiClient.sendMessage(
                     currentChatId,
-                    "LLM",
+                    Sender.Assistant,
                     assistantResponse.message.content
                 );
                 setMessages((prev) => [...prev, newMessage]);
@@ -230,7 +142,7 @@ const ChatApp: FC = () => {
                 console.error("Failed to generate response:", error);
             }
         },
-        [currentChatId, settings, apiClient]
+        [currentChatId, settings, ollamaClient]
     );
 
     const handleSendMessage = useCallback(async () => {
@@ -239,7 +151,7 @@ const ChatApp: FC = () => {
         try {
             const newMessage = await apiClient.sendMessage(
                 currentChatId,
-                "User",
+                Sender.User,
                 messageContent.trim()
             );
             setMessages((prev) => [...prev, newMessage]);
@@ -248,48 +160,49 @@ const ChatApp: FC = () => {
         } catch (error) {
             console.error("Failed to send message:", error);
         }
-    }, [currentChatId, messageContent, messages, apiClient, handleGeneration]);
-
-    
+    }, [currentChatId, messageContent, messages, handleGeneration]);
 
     const handleAddChat = useCallback(async () => {
+        console.log("Adding chat");
+        console.log("Default user:", defaultUser);
         if (!defaultUser) return;
 
         try {
             const chat = await apiClient.startChat(defaultUser.id);
+            console.log(chat);
             setChats((prev) => [...prev, chat]);
             setCurrentChatId(chat.id);
             setMessages([]);
         } catch (error) {
             console.error("Failed to add chat:", error);
         }
-    }, []);
-    const loadSettings = async (chatId: string) => {
-            try {
-                const chat = await apiClient.getChat(chatId);
-                console.log("Settings:", chat.settings);
-                if (chat.settings) {
-                    setSettings(chat.settings);
-                }
-            } catch (error) {
-                console.error("Failed to load settings:", error);
-            }
-        }
-        
-    
+    }, [defaultUser]);
 
-    const loadMessages =  async (chatId: string) => {
-            try {
-                const fetchedMessages = await apiClient.getMessages(chatId);
-                setMessages(fetchedMessages);
-                await loadSettings(chatId);
-            } catch (error) {
-                console.error("Failed to load messages:", error);
+    const loadSettings = async (chatId: string) => {
+        try {
+            const chat = await apiClient.getChat(chatId);
+            console.log("Settings:", chat.settings);
+            if (chat.settings) {
+                setSettings({
+                    sttSettings: chat.sttSettings || {},
+                    llmSettings: chat.llmSettings || {},
+                    ttsSettings: chat.ttsSettings || {},
+                });
             }
+        } catch (error) {
+            console.error("Failed to load settings:", error);
         }
-        
-       
-  
+    };
+
+    const loadMessages = async (chatId: string) => {
+        try {
+            const fetchedMessages = await apiClient.getMessages(chatId);
+            setMessages(fetchedMessages);
+            await loadSettings(chatId);
+        } catch (error) {
+            console.error("Failed to load messages:", error);
+        }
+    };
 
     const handleDeleteChat = useCallback(
         async (chatId: string) => {
@@ -317,7 +230,7 @@ const ChatApp: FC = () => {
                 console.error("Failed to delete chat:", error);
             }
         },
-        [chats, currentChatId]
+        [ chats, currentChatId]
     );
 
     const handleUpdateChat = useCallback(
@@ -340,7 +253,11 @@ const ChatApp: FC = () => {
         async (chatID: string) => {
             try {
                 console.log(settings);
-                await handleUpdateChat(chatID, { settings });
+                await handleUpdateChat(chatID, {
+                    sttSettings: settings.sttSettings,
+                    llmSettings: settings.llmSettings,
+                    ttsSettings: settings.ttsSettings,
+                });
             } catch (error) {
                 console.error("Failed to save settings:", error);
             }
@@ -348,12 +265,14 @@ const ChatApp: FC = () => {
         [handleUpdateChat, settings]
     );
 
-  
     const handleSettingsChange = useCallback(
-        (name: string, value: number | string | boolean) => {
+        (category: keyof Settings, name: string, value: number | string | boolean) => {
             setSettings((prev) => ({
                 ...prev,
-                [name]: value,
+                [category]: {
+                    ...prev[category],
+                    [name]: value,
+                },
             }));
         },
         []
@@ -489,27 +408,27 @@ const ChatApp: FC = () => {
                 <Tabs aria-label="Settings Tabs" size="sm" defaultValue={0}>
                     <TabList tabFlex="auto">
                         <Tab>STT</Tab>
-                        <Tab>TTS</Tab>
                         <Tab>LLM</Tab>
-                        <Tab>CON</Tab>
-                        <Tab>RAG</Tab>
+                        <Tab>TTS</Tab>
+                        {/* Add more tabs if necessary */}
                     </TabList>
                     <TabPanel value={0}>
                         <STTForm
-                            settings={settings}
-                            onSettingsChange={handleSettingsChange}
+                            settings={settings.sttSettings}
+                            onSettingsChange={(name, value) => handleSettingsChange('sttSettings', name, value)}
+                        />
+                    </TabPanel>
+                    <TabPanel value={1}>
+                        <LLMForm
+                            settings={settings.llmSettings}
+                            onSettingsChange={(name, value) => handleSettingsChange('llmSettings', name, value)}
                         />
                     </TabPanel>
                     <TabPanel value={2}>
-                        <LLMForm
-                            settings={settings}
-                            onSettingsChange={handleSettingsChange}
-                        />
-                    </TabPanel>
-                    <TabPanel value={3}>
                         <AsteriskForm
-                            settings={settings}
-                            onSettingsChange={handleSettingsChange}
+                            settings={settings.ttsSettings}
+                            onSettingsChange={(name, value) => handleSettingsChange('ttsSettings', name, value)}
+                            chatId={currentChatId}
                         />
                     </TabPanel>
                 </Tabs>

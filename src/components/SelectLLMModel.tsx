@@ -3,12 +3,14 @@ import Select from '@mui/joy/Select';
 import Option from '@mui/joy/Option';
 import CircularProgress from '@mui/joy/CircularProgress';
 import { Stack, Typography } from '@mui/joy';
+import OllamaAPI from '../store/OllamaAPI';
 
 
 interface SelectLLMModelProps {
     selectedModel: string | null;
     onModelChange: (model: string | null) => void;
 }
+const ollamaClient = new OllamaAPI("http://localhost:8009/api");
 
 const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelChange }) => {
     const [models, setModels] = useState<string[]>([]);
@@ -17,9 +19,10 @@ const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelC
     useEffect(() => {
         const fetchModels = async () => {
             try {
-                const response = await fetch('http://82.200.169.182:11434/api/tags');
-                const data = await response.json();
-                const modelNames = data.models.map((model: { name: string }) => model.name);
+                const response = await ollamaClient.listModels();
+                console.log(response);
+               
+                const modelNames = response.models.map((model: { name: string }) => model.name);
                 setModels(modelNames);
             } catch (error) {
                 console.error('Error fetching models:', error);

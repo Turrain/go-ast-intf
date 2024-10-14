@@ -10,32 +10,32 @@ interface LLMFormProps {
 
 interface Settings {
     model: string;
-    llm_system_prompt: string;
-    llm_system_prompt_enabled: boolean;
-    llm_mirostat: number;
-    llm_mirostat_enabled: boolean;
-    llm_mirostat_eta: number;
-    llm_mirostat_eta_enabled: boolean;
-    llm_mirostat_tau: number;
-    llm_mirostat_tau_enabled: boolean;
-    llm_num_ctx: number;
-    llm_num_ctx_enabled: boolean;
-    llm_repeat_last_n: number;
-    llm_repeat_last_n_enabled: boolean;
-    llm_repeat_penalty: number;
-    llm_repeat_penalty_enabled: boolean;
-    llm_temperature: number;
-    llm_temperature_enabled: boolean;
-    llm_tfs_z: number;
-    llm_tfs_z_enabled: boolean;
-    llm_num_predict: number;
-    llm_num_predict_enabled: boolean;
-    llm_top_k: number;
-    llm_top_k_enabled: boolean;
-    llm_top_p: number;
-    llm_top_p_enabled: boolean;
-    llm_min_p: number;
-    llm_min_p_enabled: boolean;
+    system_prompt: string;
+    system_prompt_enabled: boolean;
+    mirostat: number;
+    mirostat_enabled: boolean;
+    mirostat_eta: number;
+    mirostat_eta_enabled: boolean;
+    mirostat_tau: number;
+    mirostat_tau_enabled: boolean;
+    num_ctx: number;
+    num_ctx_enabled: boolean;
+    repeat_last_n: number;
+    repeat_last_n_enabled: boolean;
+    repeat_penalty: number;
+    repeat_penalty_enabled: boolean;
+    temperature: number;
+    temperature_enabled: boolean;
+    tfs_z: number;
+    tfs_z_enabled: boolean;
+    num_predict: number;
+    num_predict_enabled: boolean;
+    top_k: number;
+    top_k_enabled: boolean;
+    top_p: number;
+    top_p_enabled: boolean;
+    min_p: number;
+    min_p_enabled: boolean;
 }
 
 const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
@@ -51,16 +51,16 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             size="sm"
             placeholder="Напишите здесь системный промпт"
             variant="outlined"
-            value={settings.llm_system_prompt}
+            value={settings.system_prompt}
             onChange={(e) =>
-                onSettingsChange("llm_system_prompt", e.target.value)
+                onSettingsChange("system_prompt", e.target.value)
             }
         />
         <SliderWithInput
             label="Mirostat"
-            inputName="llm_mirostat"
-            value={settings.llm_mirostat}
-            enabled={settings.llm_mirostat_enabled}
+            inputName="mirostat"
+            value={settings.mirostat}
+            enabled={settings.mirostat_enabled}
             onChange={onSettingsChange}
             onToggleEnabled={(name, enabled) =>
                 onSettingsChange(`${name}_enabled`, enabled)
@@ -70,10 +70,10 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             sliderStep={1}
         />
         <Select
-            value={settings.llm_mirostat}
+            value={settings.mirostat}
             size="sm"
             onChange={(e) =>
-                onSettingsChange("llm_mirostat", parseInt(e.target.value, 10))
+                onSettingsChange("mirostat", parseInt(e.target.value, 10))
             }
         >
             <Option value={0}>Disabled</Option>
@@ -81,21 +81,21 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             <Option value={2}>Mirostat 2.0</Option>
         </Select>
         {[
-            "llm_mirostat_eta",
-            "llm_mirostat_tau",
-            "llm_num_ctx",
-            "llm_repeat_last_n",
-            "llm_repeat_penalty",
-            "llm_temperature",
-            "llm_tfs_z",
-            "llm_num_predict",
-            "llm_top_k",
-            "llm_top_p",
-            "llm_min_p",
+            "mirostat_eta",
+            "mirostat_tau",
+            "num_ctx",
+            "repeat_last_n",
+            "repeat_penalty",
+            "temperature",
+            "tfs_z",
+            "num_predict",
+            "top_k",
+            "top_p",
+            "min_p",
         ].map((setting) => (
             <SliderWithInput
                 key={setting}
-                label={setting.replace("llm_", "").replace("_", " ")}
+                label={setting.replace("", "").replace("_", " ")}
                 inputName={setting}
                 value={settings[setting]}
                 enabled={settings[`${setting}_enabled`]}

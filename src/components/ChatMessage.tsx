@@ -4,12 +4,9 @@ import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import CustomAudioPlayer from "./CustomAudioPlayer";
-interface Message {
-    id: string;
-    sender: "User" | "LLM";
-    content: string;
-    audioURL?: string;
-}
+import { Message, Sender } from "../store/ChatAPI";
+
+
 
 interface ChatMessageProps {
     message: Message;
@@ -20,17 +17,17 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
         <Box
             mb={2}
             sx={{
-                alignSelf: message.sender === "User" ? "end" : "start",
+                alignSelf: message.role === Sender.User ? "end" : "start",
             }}
         >
             <Typography
                 level="body-xs"
                 sx={{
                     mb: 0.325,
-                    textAlign: message.sender === "User" ? "end" : "start",
+                    textAlign: message.role === Sender.User ? "end" : "start",
                 }}
             >
-                {message.sender}
+                {message.role === Sender.User ? "User" : "Assistant"}
             </Typography>
             <Box
                 sx={{
@@ -77,10 +74,10 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
                     >
                         {message.content}
                     </Markdown>
-                    {message.audioURL && (
-                        <CustomAudioPlayer src={message.audioURL} />
-                    )}
                 </Typography>
+                {/* {message.audioURL && (
+                    <CustomAudioPlayer src={message.audioURL} />
+                )} */}
             </Box>
         </Box>
     );

@@ -1,23 +1,71 @@
 import axios, { AxiosInstance } from 'axios';
 
-export interface ChatMessage {
-    id: string;
-    role: "User" | "LLM";
-    content: string;
-    audioURL?: string;
-}
-
-export interface Chat {
-    id: string;
-    title: string;
-    messages: ChatMessage[];
-    input: string;
+export enum Sender {
+    User = "user",
+    Assistant = "assistant",
 }
 
 export interface User {
     id: number;
-    email: string;
     username: string;
+    email: string;
+    password?: string; // Added password field
+    createdAt: Date;
+    updatedAt: Date;
+    chats: Chat[];
+}
+
+export interface ChatSettings {
+    [key: string]: any; // Adjust according to your settings structure
+}
+export interface STTSettings {
+    beam_size: number;
+    beam_size_enabled: boolean;
+    best_of: number;
+    best_of_enabled: boolean;
+    patience: number;
+    patience_enabled: boolean;
+    no_speech_threshold: number;
+    no_speech_threshold_enabled: boolean;
+    temperature: number;
+    temperature_enabled: boolean;
+    hallucination_silence_threshold: number;
+    hallucination_silence_threshold_enabled: boolean;
+}
+export interface LLMSettings {
+    model: string;
+    system_prompt: string;
+    mirostat: number;
+    mirostat_eta: number;
+    mirostat_tau: number;
+    num_ctx: number;
+    repeat_last_n: number;
+    repeat_penalty: number;
+    temperature: number;
+    tfs_z: number;
+    num_predict: number;
+    top_k: number;
+    top_p: number;
+    min_p: number;
+}
+export interface Chat {
+    id: string;
+    userId: number;
+    startTime: Date;
+    endTime?: Date;
+    messages: Message[];
+    settings?: ChatSettings;
+    sttSettings?: STTSettings;
+    llmSettings?: LLMSettings;
+    ttsSettings?: ChatSettings;
+}
+
+export interface Message {
+    id: number;
+    chatId: string;
+    role: Sender;
+    content: string;
+    sentAt: Date;
 }
 
 class ChatAPI {
@@ -28,9 +76,9 @@ class ChatAPI {
     }
 
     // Users
-    async createUser(username: string, email: string): Promise<User | undefined> {
+    async createUser(username: string, email: string, password: string): Promise<User | undefined> {
         try {
-            const response = await this.client.post('/users', { username, email });
+            const response = await this.client.post('/users', { username, email, password });
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -93,9 +141,9 @@ class ChatAPI {
     }
 
     // Messages
-    async sendMessage(chatId: string, sender: string, content: string): Promise<Message | undefined> {
+    async sendMessage(chatId: string, sender: Sender, content: string): Promise<Message | undefined> {
         try {
-            const response = await this.client.post('/messages', { chatId, sender, content });
+            const response = await this.client.post('/messages', { chatId, role:sender, content });
             return response.data;
         } catch (error) {
             this.handleError(error);

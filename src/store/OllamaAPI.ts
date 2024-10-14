@@ -1,6 +1,5 @@
-// Define the class for interacting with the Ollama API
-
-
+import axios from 'axios';
+import { Sender } from './ChatAPI';
 
 class OllamaAPI {
   private apiUrl: string;
@@ -9,53 +8,48 @@ class OllamaAPI {
     this.apiUrl = apiUrl;
   }
 
-  async generateCompletion(model: string, prompt: string, stream: boolean = true) {
-    const response = await fetch(`${this.apiUrl}/api/generate`, {
-      method: "POST",
+  async chat(request: {
+    model: string;
+    messages: Array<{ role: Sender; content: string }>;
+    stream?: boolean;
+    keep_alive?: string | number;
+    options?: Record<string, any>;
+  }) {
+    const response = await axios.post(`${this.apiUrl}/ollama/chat`, request, {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model,
-        prompt,
-        stream,
-      }),
     });
-    return await response.json();
+    return response.data;
   }
 
-  async generateChat(model: string, messages: Array<{ role: string; content: string }>, stream: boolean = true) {
-    const response = await fetch(`${this.apiUrl}/api/chat`, {
-      method: "POST",
+  async generate(request: {
+    model: string;
+    prompt: string;
+    suffix?: string;
+    system?: string;
+    template?: string;
+    raw?: boolean;
+    images?: (Uint8Array | string)[];
+    format?: string;
+    stream?: boolean;
+    keep_alive?: string | number;
+    options?: Record<string, any>;
+  }) {
+    const response = await axios.post(`${this.apiUrl}/ollama/generate`, request, {
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        stream,
-      }),
     });
-    return await response.json();
+    return response.data;
   }
 
-  async listLocalModels() {
-    const response = await fetch(`${this.apiUrl}/api/tags`, {
-      method: "GET",
-    });
-    return await response.json();
+  async listModels() {
+    const response = await axios.get(`${this.apiUrl}/ollama/models`);
+    return response.data;
   }
 
-  async showModelInfo(name: string) {
-    const response = await fetch(`${this.apiUrl}/api/show`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
-    });
-    return await response.json();
-  }
+  // Add more methods corresponding to other Ollama API endpoints as needed
 }
 
 export default OllamaAPI;
