@@ -5,23 +5,21 @@ import CircularProgress from '@mui/joy/CircularProgress';
 import { Stack, Typography } from '@mui/joy';
 import OllamaAPI from '../store/OllamaAPI';
 
-
 interface SelectLLMModelProps {
     selectedModel: string | null;
     onModelChange: (model: string | null) => void;
 }
-const ollamaClient = new OllamaAPI("http://localhost:8009/api");
 
 const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelChange }) => {
     const [models, setModels] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const ollamaClient = new OllamaAPI("http://localhost:8009/api");
 
     useEffect(() => {
         const fetchModels = async () => {
             try {
                 const response = await ollamaClient.listModels();
                 console.log(response);
-               
                 const modelNames = response.models.map((model: { name: string }) => model.name);
                 setModels(modelNames);
             } catch (error) {
@@ -34,8 +32,8 @@ const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelC
         fetchModels();
     }, []);
 
-    const handleChange = (event: any, newValue: string | null) => {
-        onModelChange(newValue);
+    const handleChange = (event: any, value: string | null) => {
+        onModelChange(value || null);
     };
 
     return (
@@ -48,7 +46,7 @@ const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelC
                     <Select
                         size='sm'
                         placeholder="Select a model"
-                        value={selectedModel}
+                        value={selectedModel || ""}
                         onChange={handleChange}
                     >
                         {models.map((model) => (

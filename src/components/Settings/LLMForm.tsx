@@ -1,86 +1,62 @@
 import React, { FC } from "react";
-import { Typography, Textarea, Select, Option, Stack } from "@mui/joy";
+import { Typography, Textarea, Box, Button, Switch, Tooltip } from "@mui/joy";
 import SliderWithInput from "../SliderWithInput";
 import SelectLLMModel from "../SelectLLMModel";
+import { LLMSettings } from "../../types/types";
+import { InfoOutlined } from "@mui/icons-material";
 
 interface LLMFormProps {
-    settings: Settings;
-    onSettingsChange: (name: string, value: number | string) => void;
-}
-
-interface Settings {
-    model: string;
-    system_prompt: string;
-    system_prompt_enabled: boolean;
-    mirostat: number;
-    mirostat_enabled: boolean;
-    mirostat_eta: number;
-    mirostat_eta_enabled: boolean;
-    mirostat_tau: number;
-    mirostat_tau_enabled: boolean;
-    num_ctx: number;
-    num_ctx_enabled: boolean;
-    repeat_last_n: number;
-    repeat_last_n_enabled: boolean;
-    repeat_penalty: number;
-    repeat_penalty_enabled: boolean;
-    temperature: number;
-    temperature_enabled: boolean;
-    tfs_z: number;
-    tfs_z_enabled: boolean;
-    num_predict: number;
-    num_predict_enabled: boolean;
-    top_k: number;
-    top_k_enabled: boolean;
-    top_p: number;
-    top_p_enabled: boolean;
-    min_p: number;
-    min_p_enabled: boolean;
+    settings: LLMSettings;
+    onSettingsChange: (name: string, value: number | string | null) => void;
 }
 
 const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
     <form>
-        <Typography level="body-xs">Selected Model: {settings.model}</Typography>
+        <Typography level="body-xs">Selected Model: {settings.model || "Default Model"}</Typography>
         <SelectLLMModel
             selectedModel={settings.model}
             onModelChange={(val) => onSettingsChange("model", val)}
         />
-        <Typography level="body-xs">Системный промпт</Typography>
-        <Textarea
-            minRows={4}
-            size="sm"
-            placeholder="Напишите здесь системный промпт"
-            variant="outlined"
-            value={settings.system_prompt}
-            onChange={(e) =>
-                onSettingsChange("system_prompt", e.target.value)
-            }
-        />
-        <SliderWithInput
-            label="Mirostat"
-            inputName="mirostat"
-            value={settings.mirostat}
-            enabled={settings.mirostat_enabled}
-            onChange={onSettingsChange}
-            onToggleEnabled={(name, enabled) =>
-                onSettingsChange(`${name}_enabled`, enabled)
-            }
-            sliderMin={0}
-            sliderMax={2}
-            sliderStep={1}
-        />
-        <Select
-            value={settings.mirostat}
-            size="sm"
-            onChange={(e) =>
-                onSettingsChange("mirostat", parseInt(e.target.value, 10))
-            }
-        >
-            <Option value={0}>Disabled</Option>
-            <Option value={1}>Mirostat</Option>
-            <Option value={2}>Mirostat 2.0</Option>
-        </Select>
+        <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, width: '100%' }}>
+                <Typography sx={{ flex: 1 }} level="body-xs">System Prompt</Typography>
+                <Switch
+                    size="sm"
+                    checked={settings.system_prompt !== null}
+                    onChange={(e) => onSettingsChange("system_prompt", e.target.checked ? "You are an assistant." : null)}
+                    sx={{ ml: 2 }}
+                />
+                <Tooltip arrow color="primary" title={"System Prompt"} placement="top-start">
+                    <InfoOutlined
+                        sx={{
+                            fontSize: 'small',
+                            ml: 1,
+                            color: 'text.secondary',
+                            cursor: 'help'
+                        }}
+                    />
+                </Tooltip>
+            </Box>
+            {settings.system_prompt !== null ? (
+                <Textarea
+                    minRows={4}
+                    size="sm"
+                    placeholder="Enter system prompt here"
+                    variant="outlined"
+                    value={settings.system_prompt}
+                    onChange={(e) =>
+                        onSettingsChange("system_prompt", e.target.value)
+                    }
+                    sx={{ mb: 2 }}
+                />
+            ) : (
+                <Typography level="body-xs" fontWeight="400">
+                    System Prompt is disabled.
+                </Typography>
+            )}
+        </Box>
         {[
+            "mirostat",
             "mirostat_eta",
             "mirostat_tau",
             "num_ctx",
@@ -93,19 +69,97 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             "top_p",
             "min_p",
         ].map((setting) => (
-            <SliderWithInput
-                key={setting}
-                label={setting.replace("", "").replace("_", " ")}
-                inputName={setting}
-                value={settings[setting]}
-                enabled={settings[`${setting}_enabled`]}
-                onChange={onSettingsChange}
-                onToggleEnabled={(name, enabled) =>
-                    onSettingsChange(`${name}_enabled`, enabled)
-                }
-            />
+            <Box key={setting} sx={{ mb: 0.5, width: '100%', display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
+
+
+                <SliderWithInput
+                    label={setting.replace("_", " ").toUpperCase()}
+                    inputName={setting}
+                    tooltip={getTooltip(setting)}
+                    value={settings[setting] as number}
+                    enabled={settings[setting] !== null}
+                    sliderMin={getSliderMin(setting)}
+                    sliderMax={getSliderMax(setting)}
+                    sliderStep={getSliderStep(setting)}
+                    onChange={(name, value) => onSettingsChange(name, value)}
+                    onToggleEnabled={(name, enabled) => onSettingsChange(name, enabled ? getSliderMin(setting) : null)}
+                />
+
+            </Box>
         ))}
     </form>
 );
+
+// Utility functions
+const getSliderMin = (name: string): number => {
+    const mins: { [key: string]: number } = {
+        mirostat: 0,
+        mirostat_eta: 0,
+        mirostat_tau: 0,
+        num_ctx: 0,
+        repeat_last_n: 0,
+        repeat_penalty: 0,
+        temperature: 0,
+        tfs_z: 0,
+        num_predict: 0,
+        top_k: 0,
+        top_p: 0,
+        min_p: 0,
+    };
+    return mins[name] ?? 0;
+};
+const getTooltip = (name: string): string => {
+    const tooltips: { [key: string]: string } = {
+        mirostat: "Миростат: Алгоритм динамической регулировки температуры",
+        mirostat_eta: "Миростат Эта: Скорость обучения для алгоритма миростат",
+        mirostat_tau: "Миростат Тау: Целевая энтропия для алгоритма миростат",
+        num_ctx: "Размер контекста: Количество токенов для рассмотрения",
+        repeat_last_n: "Повтор последних N: Количество токенов для проверки повторов",
+        repeat_penalty: "Штраф за повтор: Снижает вероятность повторения текста",
+        temperature: "Температура: Контролирует случайность вывода",
+        tfs_z: "TFS Z: Порог для хвостового свободного сэмплирования",
+        num_predict: "Количество предсказаний: Максимальное число генерируемых токенов",
+        top_k: "Top K: Ограничивает выбор наиболее вероятными K токенами",
+        top_p: "Top P: Выбирает из наиболее вероятных токенов с суммарной вероятностью P",
+        min_p: "Min P: Минимальная вероятность для рассмотрения токена",
+    };
+    return tooltips[name] ?? "Нет описания";
+};
+
+const getSliderMax = (name: string): number => {
+    const maxs: { [key: string]: number } = {
+        mirostat: 5,
+        mirostat_eta: 1,
+        mirostat_tau: 1,
+        num_ctx: 4096,
+        repeat_last_n: 100,
+        repeat_penalty: 2,
+        temperature: 1,
+        tfs_z: 2,
+        num_predict: 500,
+        top_k: 100,
+        top_p: 1,
+        min_p: 1,
+    };
+    return maxs[name] ?? 10;
+};
+
+const getSliderStep = (name: string): number => {
+    const steps: { [key: string]: number } = {
+        mirostat: 1,
+        mirostat_eta: 0.1,
+        mirostat_tau: 0.1,
+        num_ctx: 100,
+        repeat_last_n: 10,
+        repeat_penalty: 0.1,
+        temperature: 0.1,
+        tfs_z: 0.1,
+        num_predict: 50,
+        top_k: 10,
+        top_p: 0.1,
+        min_p: 0.1,
+    };
+    return steps[name] ?? 1;
+};
 
 export default LLMForm;

@@ -1,38 +1,33 @@
-import React, { FC } from "react";
-import { Box, Input, Button } from "@mui/joy";
+import React, { useState, FC, FormEvent } from 'react';
+import { Box, Textarea, Button } from '@mui/joy';
 
 interface ChatInputProps {
-    messageContent: string;
-    setMessageContent: (content: string) => void;
-    handleSendMessage: () => void;
+    onSend: (content: string) => Promise<void>;
 }
 
-const ChatInput: FC<ChatInputProps> = ({ messageContent, setMessageContent, handleSendMessage }) => {
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
+const ChatInput: FC<ChatInputProps> = ({ onSend }) => {
+    const [content, setContent] = useState('');
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        if (content.trim() === '') return;
+        await onSend(content.trim());
+        setContent('');
     };
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                gap: 1,
-                p: 2,
-                borderTop: "1px solid #ccc",
-            }}
-        >
-            <Input
+        <Box component="form" onSubmit={handleSubmit} sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+            <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 placeholder="Type your message..."
-                value={messageContent}
-                onChange={(e) => setMessageContent(e.target.value)}
-                onKeyPress={handleKeyPress}
+                minRows={2}
+                maxRows={6}
+                variant="outlined"
                 fullWidth
-                multiline
+                sx={{ mb: 2 }}
             />
-            <Button onClick={handleSendMessage} variant="solid">
+            <Button type="submit" variant="solid" fullWidth>
                 Send
             </Button>
         </Box>

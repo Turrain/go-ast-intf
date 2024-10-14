@@ -22,23 +22,14 @@ class AsteriskAPI {
    * @param params - Additional parameters for the channel.
    * @returns A promise that resolves with the channel ID.
    */
-  async originateChannel(endpoint: string, params: OriginateChannelParams): Promise<OriginateChannelResponse> {
+  async originateChannel(endpoint: string, data: { chatId: string }) {
     try {
-      const response = await axios.post<OriginateChannelResponse>(
-        `${this.apiUrl}/api/asterisk/originate`,
-        { endpoint, ...params },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      return response.data;
+        const response = await axios.post(`${this.apiUrl}/originate`, { endpoint, ...data });
+        return response.data;
     } catch (error: any) {
-      console.error('Failed to originate channel:', error);
-      throw error.response?.data || { error: 'Unknown error occurred' };
+        throw new Error(error.response?.data?.message || 'Failed to originate channel.');
     }
-  }
+}
 }
 
  

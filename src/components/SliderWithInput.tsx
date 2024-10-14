@@ -1,6 +1,7 @@
     // Start of Selection
     import React, { useState, useCallback, ChangeEvent, FC, memo } from "react";
-    import { Stack, Typography, Switch, Input, Slider } from "@mui/joy";
+    import { Stack, Typography, Switch, Input, Slider, Tooltip } from "@mui/joy";
+import { InfoOutlined } from "@mui/icons-material";
 
     type InputVariant = "solid" | "outlined" | "plain";
     type InputSize = "sm" | "md" | "lg";
@@ -24,6 +25,7 @@
         stackGap?: number;
         value: number;
         enabled: boolean;
+        tooltip?: string;
         onChange: (name: string, value: number | string) => void;
         onToggleEnabled: (name: string, enabled: boolean) => void;
     }
@@ -45,6 +47,7 @@
             stackDirection = "row",
             stackGap = 1,
             value,
+            tooltip,
             enabled,
             onChange,
             onToggleEnabled,
@@ -92,22 +95,32 @@
                         gap={1}
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{ height: "20px", my: 0.75 }}
+                        sx={{ height: "20px", my: 0.3, width: '100%' }}
                     >
                         <Typography level="body-xs">{label}</Typography>
-                        <Stack direction="row" gap={0.5} alignItems="center">
+                        <Stack direction="row" gap={0.1} alignItems="center">
                             <Switch
                                 checked={enabled}
                                 onChange={handleToggleEnabled}
                                 size={inputSize}
                             />
+                            {tooltip && <Tooltip arrow color="primary" title={tooltip} placement="top-start">
+                                <InfoOutlined
+                                    sx={{
+                                        fontSize: 'small',
+                                        ml: 1,
+                                        color: 'text.secondary',
+                                        cursor: 'help'
+                                    }}
+                                />
+                            </Tooltip>}
                         </Stack>
                     </Stack>
                     {enabled && (
                         <Stack
                             direction={stackDirection}
                             gap={stackGap}
-                            sx={{ px: 1, height: "30px" }}
+                            sx={{ px: 1, height: "30px", width: '100%' }}
                         >
                             <Input
                                 sx={{ width: inputWidth }}
