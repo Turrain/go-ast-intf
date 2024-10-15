@@ -1,8 +1,9 @@
 import React, { FC, useState } from "react";
-import { Typography, Input, Button, Sheet, Alert, CircularProgress, Switch, Box } from "@mui/joy";
+import { Typography, Input, Button, Sheet, Alert, CircularProgress, Switch, Box, Tooltip } from "@mui/joy";
 import { AsteriskSettings } from "../../types/types";
 import { useStore } from "../../store/ChatStore";
 import AsteriskAPI from "../../store/AsteriskAPI";
+import { InfoOutlined } from "@mui/icons-material";
 
 interface AsteriskFormProps {
     chatId: string;
@@ -43,15 +44,31 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
         <Sheet
             color="primary"
             variant="soft"
-            sx={{ p: 1, borderRadius: 2, mt: 2 }}
+            sx={{ p: 1, mt: 2, borderRadius: '18px' }}
         >
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography level="body-xs">Asterisk Host</Typography>
+                <Typography level="body-xs" sx={{ flex: 1 }}>Asterisk Host</Typography>
                 <Switch
+                  size="sm"
                     checked={settings.asterisk_host !== null}
                     onChange={(e) => onSettingsChange("asterisk_host", e.target.checked ? "192.168.25.63" : null)}
                     sx={{ ml: 2 }}
                 />
+                 <Tooltip
+                    arrow
+                    color="primary"
+                    title={"Asterisk Host"}
+                    placement="top-start"
+                >
+                    <InfoOutlined
+                        sx={{
+                            fontSize: 'small',
+                            ml: 1,
+                            color: 'text.secondary',
+                            cursor: 'help'
+                        }}
+                    />
+                </Tooltip>
             </Box>
             {settings.asterisk_host !== null && (
                 <Input
@@ -67,17 +84,33 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
                 />
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography level="body-xs">Endpoint</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center',  mb: 2 }}>
+                <Typography level="body-xs" sx={{ flex: 1 }}>Endpoint</Typography>
                 <Switch
+                size="sm"
                     checked={settings.asterisk_number !== null}
                     onChange={(e) => onSettingsChange("asterisk_number", e.target.checked ? "PJSIP/7000" : null)}
                     sx={{ ml: 2 }}
                 />
+                <Tooltip
+                    arrow
+                    color="primary"
+                    title={"Endpoint"}
+                    placement="top-start"
+                >
+                    <InfoOutlined
+                        sx={{
+                            fontSize: 'small',
+                            ml: 1,
+                            color: 'text.secondary',
+                            cursor: 'help'
+                        }}
+                    />
+                </Tooltip>
             </Box>
             {settings.asterisk_number !== null && (
                 <Input
-                    sx={{ mb: 1 }}
+                    sx={{ mb: 1, borderRadius: '18px' }}
                     variant="soft"
                     fullWidth
                     size="sm"
@@ -103,6 +136,7 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
                 variant="solid"
                 color="primary"
                 fullWidth
+                sx={{ borderRadius: '18px' }}
                 onClick={handleCall}
                 disabled={loading || settings.asterisk_number === null}
                 startDecorator={loading ? <CircularProgress size="sm" /> : null}

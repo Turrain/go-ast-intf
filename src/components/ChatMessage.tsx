@@ -61,7 +61,7 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: message.role === Sender.User ? 'flex-end' : 'flex-start',
-
+             
                 alignSelf: message.role === Sender.User ? "end" : "start",
                 maxWidth: '60%',
                  minWidth: '30%'
@@ -83,7 +83,7 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
             <Box
                 sx={{
                     backgroundColor: "background.surface",
-                    borderRadius: "10px",
+                    borderRadius: "18px",
                     padding: "10px",
                     maxWidth: { xs: "100%", md: "90%" },
                     boxShadow: "0 1px 1px rgba(0, 0, 0, 0.2)",

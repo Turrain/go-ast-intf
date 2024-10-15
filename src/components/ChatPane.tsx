@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, FC } from "react";
+import React, { useEffect, useCallback, FC, useState } from "react";
 import {
     Box,
     Sheet,
@@ -15,8 +15,11 @@ import {
     ListItem,
     ListItemContent,
     tabClasses,
+    ModalDialog,
+    Modal,
+    Input,
 } from "@mui/joy";
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { useStore } from "../store/ChatStore";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
@@ -39,7 +42,11 @@ const ChatPane: FC = () => {
     const saveSettingsChat = useStore((state) => state.saveSettingsChat);
     const error = useStore((state) => state.error);
     const currentChat = useStore((state) => state.currentChat);
+    const renameChat = useStore((state) => state.renameChat); //
 
+    const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+    const [newTitle, setNewTitle] = useState<string>('');
+    
     useEffect(() => {
         initialize();
     }, [initialize]);
@@ -47,6 +54,12 @@ const ChatPane: FC = () => {
     const handleSendMessage = useCallback(async (content: string) => {
         await sendMessage(content);
     }, [sendMessage]);
+    
+    const handleRename = async (chatId: string) => {
+        await renameChat(chatId, newTitle);
+        setRenamingChatId(null);
+        setNewTitle('');
+    };
 
     return (
         <Box
@@ -59,8 +72,28 @@ const ChatPane: FC = () => {
                 scrollSnapType: 'x mandatory',
                 scrollBehavior: 'smooth',
                 gap: 1,
+                position: 'relative',
+                backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='gray' opacity='0.1' transform='translate(-50%, -50%)'>TEST(L)</text></svg>")`,
+                backgroundRepeat: 'repeat',
+                backgroundSize: '300px 300px',
             }}
         >
+           {/* <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%) rotate(45deg)', // Added rotate(45deg)
+                    opacity: 0.05,
+                    fontSize: '5rem',
+                    color: 'gray',
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                }}
+            >
+                Лехич Playground
+            </Box> */}
+
             <Sheet
                 sx={{
                     minWidth: { xs: '100dvw', md: '350px' },
@@ -88,33 +121,95 @@ const ChatPane: FC = () => {
 
                 <List sx={{ px: 2, gap: 1 }}>
                     {chats.map((chat: Chat) => (
-                        <ListItem key={chat.id}>
-                            <ListItemButton
-                                sx={{
-                                    backgroundColor: 'background.surface',
-                                    borderRadius: '18px',
-                                }}
-                                onClick={() => selectChat(chat.id)}
-                                selected={chat.id === currentChat}
-                            >
-                                <ListItemContent>
-                                    <Typography level="body-xs">
-                                        {chat.id}
-                                    </Typography>
-                                </ListItemContent>
-                                <IconButton
-                                    size="sm"
-                                    variant="plain"
-                                    color="neutral"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        deleteChat(chat.id);
-                                    }}
-                                >
-                                    <Delete />
-                                </IconButton>
-                            </ListItemButton>
-                        </ListItem>
+                       <ListItem key={chat.id}>
+                       <ListItemButton
+                           sx={{
+                               backgroundColor: 'background.surface',
+                               borderRadius: '18px',
+                           }}
+                           onClick={() => selectChat(chat.id)}
+                           selected={chat.id === currentChat}
+                       >
+                           <ListItemContent>
+                               <Typography level="body-xs">
+                                   {chat.title || chat.id} {/* Display title if available */}
+                               </Typography>
+                           </ListItemContent>
+                           <IconButton
+                               size="sm"
+                               variant="plain"
+                               color="neutral"
+                               sx={{
+                                opacity: chat.id !== currentChat ? 0.1 : 1,
+                                '&:hover': {
+                                    opacity: 1,
+                                },
+                               }}
+                               onClick={(e) => {
+                                   e.stopPropagation();
+                                   deleteChat(chat.id);
+                               }}
+                           >
+                               <Delete />
+                           </IconButton>
+                           <IconButton
+                               size="sm"
+                               variant="plain"
+                               color="neutral"
+                               sx={{
+                                opacity: chat.id !== currentChat ? 0.1 : 1,
+                                '&:hover': {
+                                    opacity: 1,
+                                },
+                               }}
+                               onClick={(e) => {
+                                   e.stopPropagation();
+                                   setRenamingChatId(chat.id);
+                                   setNewTitle(chat.title || '');
+                               }}
+                           >
+                               {/* You can use an edit icon here */}
+                               <Edit />
+                           </IconButton>
+                       </ListItemButton>
+                       {/* Rename Modal */}
+                       {renamingChatId === chat.id && (
+                           <Modal
+                               open={true}
+                               onClose={() => setRenamingChatId(null)}
+                               aria-labelledby="rename-chat-title"
+                               aria-describedby="rename-chat-description"
+                           >
+                               <ModalDialog>
+                                   <Typography id="rename-chat-title" level="h6" mb={2}>
+                                       Rename Chat
+                                   </Typography>
+                                   <Input
+                                       value={newTitle}
+                                       onChange={(e) => setNewTitle(e.target.value)}
+                                       placeholder="Enter new chat title"
+                                       fullWidth
+                                       sx={{ mb: 2 }}
+                                   />
+                                   <Button
+                                       variant="solid"
+                                       color="primary"
+                                       onClick={() => handleRename(chat.id)}
+                                       sx={{ mr: 2 }}
+                                   >
+                                       Save
+                                   </Button>
+                                   <Button
+                                       variant="plain"
+                                       color="neutral"
+                                       onClick={() => setRenamingChatId(null)}
+                                   >
+                                       Cancel
+                                   </Button>
+                               </ModalDialog>
+                           </Modal>
+                       )}
+                   </ListItem>
                     ))}
                 </List>
             </Sheet>
@@ -124,6 +219,7 @@ const ChatPane: FC = () => {
                 minWidth: {xs: '100dvw', md: 'unset'},
                 width: {xs: '100dvw', md: '100%'},
                 px: 4,
+                pb:4,
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column'

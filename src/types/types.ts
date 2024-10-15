@@ -74,4 +74,5 @@ export enum Sender {
     endTime?: Date;
     messages: Message[];
     settings?: Settings;
+    title?: string;
   }
