@@ -19,7 +19,7 @@ import {
     Modal,
     Input,
 } from "@mui/joy";
-import { Delete, Edit } from "@mui/icons-material";
+import { Clear, Delete, Edit } from "@mui/icons-material";
 import { useStore } from "../store/ChatStore";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
@@ -118,17 +118,18 @@ const ChatPane: FC = () => {
                     >
                         New Chat
                     </Button>
+                  
+                    <IconButton
+                        onClick={() => clearMessages(currentChat!)}
+                        color="danger"
+                        variant="plain"
+                        sx={{ mt: 2, mb: 1, borderRadius: '50%', boxShadow: 'sm' }}
+                    >
+                        <Clear />
+                    </IconButton>
                     <ColorSchemeToggle sx={{ mt: 2, mb: 1, borderRadius: '50%', px: 1.25, boxShadow: 'sm' }} />
                 </Box>
-                <Button
-       onClick={() => clearMessages(currentChat!)}
-       fullWidth
-       color="danger"
-       variant="plain"
-       sx={{ mt: 2, mb: 1, backgroundColor: 'background.level1', borderRadius: '18px', boxShadow: 'sm'}}
-   >
-       Clear Messages
-   </Button>
+             
                 <List sx={{ px: 2, gap: 1 }}>
                     {chats.map((chat: Chat) => (
                        <ListItem key={chat.id}>

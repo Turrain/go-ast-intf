@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Typography, Textarea, Box, Button, Switch, Tooltip } from "@mui/joy";
+import { Typography, Textarea, Box, Button, Switch, Tooltip, Input } from "@mui/joy";
 import SliderWithInput from "../SliderWithInput";
 import SelectLLMModel from "../SelectLLMModel";
 import { LLMSettings } from "../../types/types";
@@ -52,7 +52,42 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
                 />
             ) }
         </Box>
+        <Box sx={{ mt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, width: '100%' }}>
+                <Typography sx={{ flex: 1 }} level="body-xs">Seed</Typography>
+                <Switch
+                    size="sm"
+                    checked={settings.seed !== null}
+                    onChange={(e) => onSettingsChange("seed", e.target.checked ? 0 : null)}
+                    sx={{ ml: 2 }}
+                />
+                <Tooltip arrow color="primary" title={"Seed"} placement="top-start">
+                    <InfoOutlined
+                        sx={{
+                            fontSize: 'small',
+                            ml: 1,
+                            color: 'text.secondary',
+                            cursor: 'help'
+                        }}
+                    />
+                </Tooltip>
+            </Box>
+            {settings.seed !== null && (
+                <Input
+                    type="number"
+                    size="sm"
+                    placeholder="Enter seed value"
+                    variant="outlined"
+                    value={settings.seed}
+                    onChange={(e) =>
+                        onSettingsChange("seed", parseInt(e.target.value, 10))
+                    }
+                    sx={{ mb: 2 }}
+                />
+            )}
+        </Box>
         {[
+            
             "mirostat",
             "mirostat_eta",
             "mirostat_tau",
@@ -90,6 +125,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
 // Utility functions
 const getSliderMin = (name: string): number => {
     const mins: { [key: string]: number } = {
+       
         mirostat: 0,
         mirostat_eta: 0,
         mirostat_tau: 0,
@@ -107,6 +143,7 @@ const getSliderMin = (name: string): number => {
 };
 const getTooltip = (name: string): string => {
     const tooltips: { [key: string]: string } = {
+      
         mirostat: "Миростат: Алгоритм динамической регулировки температуры",
         mirostat_eta: "Миростат Эта: Скорость обучения для алгоритма миростат",
         mirostat_tau: "Миростат Тау: Целевая энтропия для алгоритма миростат",
@@ -125,6 +162,7 @@ const getTooltip = (name: string): string => {
 
 const getSliderMax = (name: string): number => {
     const maxs: { [key: string]: number } = {
+  
         mirostat: 5,
         mirostat_eta: 1,
         mirostat_tau: 1,
@@ -143,6 +181,7 @@ const getSliderMax = (name: string): number => {
 
 const getSliderStep = (name: string): number => {
     const steps: { [key: string]: number } = {
+      
         mirostat: 1,
         mirostat_eta: 0.1,
         mirostat_tau: 0.1,

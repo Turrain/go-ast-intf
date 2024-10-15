@@ -23,6 +23,7 @@ export enum Sender {
   }
   
   export interface LLMSettings {
+    seed: number | null;
     model: string | null;
     system_prompt: string | null;
     mirostat: number | null;

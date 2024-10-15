@@ -80,6 +80,7 @@ export const useStore = create<StoreState>(
                         hallucination_silence_threshold: null,
                     },
                     llmSettings: {
+                        seed: 0,
                         model: null,
                         system_prompt: null,
                         mirostat: null,
