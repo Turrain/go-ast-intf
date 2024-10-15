@@ -13,7 +13,7 @@ interface SelectLLMModelProps {
 const SelectLLMModel: React.FC<SelectLLMModelProps> = ({ selectedModel, onModelChange }) => {
     const [models, setModels] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const ollamaClient = new OllamaAPI("http://localhost:8009/api");
+    const ollamaClient = new OllamaAPI(import.meta.env.VITE_BASE_API_URL || "zero");
 
     useEffect(() => {
         const fetchModels = async () => {

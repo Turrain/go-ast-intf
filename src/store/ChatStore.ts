@@ -29,6 +29,7 @@ interface StoreState {
     saveSettingsChat: (chatId: string) => Promise<void>;
     updateMessage: (messageId: number, newContent: string) => Promise<void>;
     deleteMessage: (messageId: number) => Promise<void>;
+    clearMessages: (chatId: string) => Promise<void>;
 }
 
 type MyPersist = (
@@ -39,7 +40,7 @@ type MyPersist = (
 export const useStore = create<StoreState>(
     (persist as MyPersist)(
         (set, get) => {
-            const apiClient = ChatAPI.getInstance("http://localhost:8009/api");
+            const apiClient = ChatAPI.getInstance(import.meta.env.VITE_BASE_API_URL || "zero");
             apiClient.connect(); // Establish the Socket.IO connection once
 
             // Setup real-time event listeners with Zustand's set function
@@ -137,7 +138,7 @@ export const useStore = create<StoreState>(
                 },
 
                 addChat: async () => {
-                    const ollamaClient = new OllamaAPI("http://localhost:8009/api");
+                    const ollamaClient = new OllamaAPI(import.meta.env.VITE_BASE_API_URL || "zero");
                     const user = get().user;
                     if (!user) return;
 
@@ -217,7 +218,7 @@ export const useStore = create<StoreState>(
                         }
                         if (!newTitle) {
                             // Generate a short title using LLM via OllamaAPI
-                            const ollamaClient = new OllamaAPI("http://localhost:8009/api");
+                            const ollamaClient = new OllamaAPI(import.meta.env.VITE_BASE_API_URL || "zero");
                             const response = await ollamaClient.chat({
                                 model: "gemma2:9b", // Replace with your actual model
                                 messages: [
@@ -259,12 +260,21 @@ export const useStore = create<StoreState>(
                         console.error("Rename Chat Error:", error);
                     }
                 },
+                clearMessages: async (chatId: string) => {
+                    try {
+                        await apiClient.clearMessages(chatId);
+                        set({ messages: [] });
+                    } catch (error: any) {
+                        set({ error: error.message });
+                        console.error("Clear Messages Error:", error);
+                    }
+                },
                 sendMessage: async (content: string) => {
                     try {
                         const currentChatId = get().currentChat;
                         if (!currentChatId?.trim() || !content.trim()) return;
 
-                        const ollamaClient = new OllamaAPI("http://localhost:8009/api");
+                        const ollamaClient = new OllamaAPI(import.meta.env.VITE_BASE_API_URL || "zero");
                         const userMessage = await apiClient.sendMessage(currentChatId, Sender.User, content.trim());
                         const llmSettings = get().settings.llmSettings;
 

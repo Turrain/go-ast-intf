@@ -17,7 +17,7 @@ const ChatInput: FC<ChatInputProps> = ({ onSend }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{  }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ px:12  }}>
             <Stack direction="row" sx={{alignItems: 'center', mb: 2, gap:2}}>
             <Textarea
                 value={content}

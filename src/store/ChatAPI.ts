@@ -9,7 +9,7 @@ class ChatAPI {
 
     private constructor(baseURL: string) {
         this.client = axios.create({ baseURL });
-        this.socket = io("http://localhost:8009");
+        this.socket = io(baseURL);
 
         this.setupSocketListeners();
     }
@@ -31,7 +31,13 @@ class ChatAPI {
             this.handleError(error);
         }
     }
-
+    async clearMessages(chatId: string): Promise<void> {
+        try {
+            await this.client.delete(`/messages/clear/${chatId}`);
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
     async listUsers(): Promise<User[] | undefined> {
         try {
             const response = await this.client.get('/users');

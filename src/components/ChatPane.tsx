@@ -43,7 +43,7 @@ const ChatPane: FC = () => {
     const error = useStore((state) => state.error);
     const currentChat = useStore((state) => state.currentChat);
     const renameChat = useStore((state) => state.renameChat); //
-
+    const clearMessages = useStore((state) => state.clearMessages);
     const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
     const [newTitle, setNewTitle] = useState<string>('');
     
@@ -106,6 +106,8 @@ const ChatPane: FC = () => {
                     borderColor: 'divider',
                 }}
             >
+                {/* <Typography level="body-xs">{import.meta.env.MODE }</Typography>
+                <Typography level="body-xs">{import.meta.env.VITE_BASE_API_URL }</Typography> */}
                 <Box sx={{ px: 2, display: 'flex', flexDirection: 'row', gap: 1 }}>
                     <Button
                         onClick={() => addChat()}
@@ -118,7 +120,15 @@ const ChatPane: FC = () => {
                     </Button>
                     <ColorSchemeToggle sx={{ mt: 2, mb: 1, borderRadius: '50%', px: 1.25, boxShadow: 'sm' }} />
                 </Box>
-
+                <Button
+       onClick={() => clearMessages(currentChat!)}
+       fullWidth
+       color="danger"
+       variant="plain"
+       sx={{ mt: 2, mb: 1, backgroundColor: 'background.level1', borderRadius: '18px', boxShadow: 'sm'}}
+   >
+       Clear Messages
+   </Button>
                 <List sx={{ px: 2, gap: 1 }}>
                     {chats.map((chat: Chat) => (
                        <ListItem key={chat.id}>

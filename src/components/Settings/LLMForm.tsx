@@ -18,7 +18,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
             onModelChange={(val) => onSettingsChange("model", val)}
         />
         <Box sx={{ mt: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, width: '100%' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, width: '100%',  }}>
                 <Typography sx={{ flex: 1 }} level="body-xs">System Prompt</Typography>
                 <Switch
                     size="sm"
@@ -43,6 +43,7 @@ const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
                     size="sm"
                     placeholder="Enter system prompt here"
                     variant="outlined"
+                    maxRows={10}
                     value={settings.system_prompt}
                     onChange={(e) =>
                         onSettingsChange("system_prompt", e.target.value)

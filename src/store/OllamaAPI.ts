@@ -15,12 +15,34 @@ class OllamaAPI {
     keep_alive?: string | number;
     options?: Record<string, any>;
   }) {
-    const response = await axios.post(`${this.apiUrl}/ollama/chat`, request, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.data;
+    if (request.stream) {
+      const response = await axios({
+          method: 'post',
+          url: `${this.apiUrl}/ollama/chat`,
+          data: request,
+          responseType: 'stream',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+      response.data.on('data', (chunk) => {
+          // Handle each chunk of data
+          console.log('Received chunk:', chunk.toString());
+      });
+
+      return new Promise((resolve, reject) => {
+          response.data.on('end', () => resolve('Stream ended'));
+          response.data.on('error', reject);
+      });
+  } else {
+      const response = await axios.post(`${this.apiUrl}/ollama/chat`, request, {
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+      return response.data;
+  }
   }
 
   async generate(request: {
@@ -43,6 +65,8 @@ class OllamaAPI {
     });
     return response.data;
   }
+
+
 
   async listModels() {
     const response = await axios.get(`${this.apiUrl}/ollama/models`);

@@ -12,11 +12,11 @@ interface AsteriskFormProps {
 }
 
 const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChange }) => {
-    const asteriskAPI = new AsteriskAPI('http://192.168.25.63:8009');
+    const asteriskAPI = new AsteriskAPI(`${import.meta.env.VITE_BASE_API_URL}/asterisk` || "zero");
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+    const currentChat = useStore((state) => state.currentChat);
     const handleCall = async () => {
         const endpoint = settings.asterisk_number;
 
@@ -30,7 +30,7 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
         setErrorMessage(null);
 
         try {
-            const response = await asteriskAPI.originateChannel(endpoint, { chatId });
+            const response = await asteriskAPI.originateChannel(endpoint, { chatId: currentChat || '' });
             setSuccessMessage(response.message);
             console.log('Channel ID:', response.channelId);
         } catch (error: any) {
@@ -46,8 +46,9 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
             variant="soft"
             sx={{ p: 1, mt: 2, borderRadius: '18px' }}
         >
+          
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Typography level="body-xs" sx={{ flex: 1 }}>Asterisk Host</Typography>
+                <Typography level="body-xs" sx={{ flex: 1 }}>Asterisk Host / {currentChat}</Typography>
                 <Switch
                   size="sm"
                     checked={settings.asterisk_host !== null}
