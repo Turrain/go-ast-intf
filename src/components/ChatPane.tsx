@@ -69,6 +69,7 @@ const ChatPane: FC = () => {
                 flexDirection: 'row',
                 minHeight: '100vh',
                 overflowX: 'auto',
+           
                 scrollSnapType: 'x mandatory',
                 scrollBehavior: 'smooth',
                 gap: 1,
@@ -277,7 +278,7 @@ const ChatPane: FC = () => {
                     scrollSnapAlign: 'start',
                     width: {xs: '100dvw', md: '350px'},
                     minWidth: {xs: '100dvw', md: '350px'},
-                  
+                    overflow: 'auto',
                     px: 2,
                 }}
             >
