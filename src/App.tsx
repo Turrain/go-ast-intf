@@ -29,10 +29,12 @@ function App() {
               gap: 1,
             }}
           >
+            
             <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+          
               <Sheet
                 sx={{
-                  height: { xs: 'calc(100dvh - var(--Header-height))', md: '100dvh' },
+                  height: { xs: 'calc(100dvh - 10px)', md: '100dvh' },
                   display: 'flex',
                   width: '100%',
                   flexDirection: 'column',

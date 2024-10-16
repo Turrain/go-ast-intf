@@ -147,13 +147,44 @@ export const useStore = create<StoreState>(
                         const chat = await apiClient.startChat(user.id);
                         if (chat) { // Ensure chat is defined
                             set((state) => ({
-                                chats: [...state.chats, chat],
+                                chats: [chat, ...state.chats ],
+                                currentChat: chat.id,
                                 messages: [],
                                 settings: {
-                                    ...state.settings,
+                                    sttSettings: {
+                                        beam_size: null,
+                                        best_of: null,
+                                        patience: null,
+                                        no_speech_threshold: null,
+                                        temperature: null,
+                                        hallucination_silence_threshold: null,
+                                    },
+                                    llmSettings: {
+                                        seed: null,
+                                        model: null,
+                                        system_prompt: null,
+                                        mirostat: null,
+                                        mirostat_eta: null,
+                                        mirostat_tau: null,
+                                        num_ctx: null,
+                                        repeat_last_n: null,
+                                        repeat_penalty: null,
+                                        temperature: null,
+                                        tfs_z: null,
+                                        num_predict: null,
+                                        top_k: null,
+                                        top_p: null,
+                                        min_p: null,
+                                    },
+                                    ttsSettings: {
+                                        voice: null,
+                                        speed: null,
+                                    },
                                     asteriskSettings: {
-                                        ...state.settings.asteriskSettings,
-                                        asterisk_number: null, // default value set to null (disabled)
+                                        asterisk_min_audio_length: null,
+                                        asterisk_silence_threshold: null,
+                                        asterisk_host: null,
+                                        asterisk_number: null,
                                     },
                                 },
                             }));
