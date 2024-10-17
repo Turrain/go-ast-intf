@@ -12,7 +12,7 @@ interface LLMFormProps {
 
 const LLMForm: FC<LLMFormProps> = ({ settings, onSettingsChange }) => (
     <form>
-        <Typography level="body-xs" sx={{ mb: 1 }}>Selected Model: {settings.model || "Default Model"}</Typography>
+        <Typography level="body-xs" sx={{ mb: 1 }}>Selected Model: {settings?.model || "Default Model"}</Typography>
         <SelectLLMModel
             selectedModel={settings.model}
             onModelChange={(val) => onSettingsChange("model", val)}

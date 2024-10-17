@@ -24,8 +24,8 @@ import {
     MenuItem,
     Dropdown,
 } from "@mui/joy";
-import { Clear, Delete, Edit, MoreVert } from "@mui/icons-material";
-import { useStore } from "../store/ChatStore";
+import { Clear, Delete, Edit, Logout, MoreVert } from "@mui/icons-material";
+
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import STTForm from "./Settings/STTForm";
@@ -33,28 +33,46 @@ import LLMForm from "./Settings/LLMForm";
 import AsteriskForm from "./Settings/AsteriskForm";
 import { Chat } from "../types/types";
 import ColorSchemeToggle from "./ColorSchemeToggle";
+import { useStore } from "zustand";
+import { useChatStore } from "../store/ChatStore";
+import { useMessageStore } from "../store/MessageStore";
+import { useSettingsStore } from "../store/SettingsStore";
+import { useAuthStore } from "../store/AuthStore";
 
 const ChatPane: FC = () => {
-    const chats = useStore((state) => state.chats);
-    const messages = useStore((state) => state.messages);
-    const settings = useStore((state) => state.settings);
-    const addChat = useStore((state) => state.addChat);
-    const deleteChat = useStore((state) => state.deleteChat);
-    const selectChat = useStore((state) => state.selectChat);
-    const sendMessage = useStore((state) => state.sendMessage);
-    const updateSettings = useStore((state) => state.updateSettings);
-    const initialize = useStore((state) => state.initialize);
-    const saveSettingsChat = useStore((state) => state.saveSettingsChat);
-    const error = useStore((state) => state.error);
-    const currentChat = useStore((state) => state.currentChat);
-    const renameChat = useStore((state) => state.renameChat); //
-    const clearMessages = useStore((state) => state.clearMessages);
+
+    const chats = useChatStore(state => state.chats);
+    const currentChat = useChatStore(state => state.currentChat);
+    const selectChat = useChatStore(state => state.selectChat);
+    const addChat = useChatStore(state => state.addChat);
+    const deleteChat = useChatStore(state => state.deleteChat);
+    const renameChat = useChatStore(state => state.renameChat); 
+   // const initialize = useChatStore(state => state.initialize);
+    const messages = useMessageStore(state => state.messages);
+    const clearMessages = useMessageStore(state => state.clearMessages);
+    const sendMessage = useMessageStore((state) => state.sendMessage);
+    //
+    const logoutUser = useAuthStore((state)=> state.logoutUser)
+    const user = useAuthStore((state)=> state.user)
+    const getChats = useChatStore((state) => state.getChats);
+    const settings = useSettingsStore((state) => state.settings);
+
+    const saveSettingsChat = useSettingsStore((state) => state.saveSettingsChat);
+    
+    const updateSettings = useSettingsStore((state) => state.updateSettings);
+  //  const initialize = useStore((state) => state.initialize);
+    //const saveSettingsChat = useStore((state) => state.saveSettingsChat);
+   // const error = useStore((state) => state.error);
+
+    
+    useEffect(() => {
+        getChats();
+    }, []);
+  
     const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
     const [newTitle, setNewTitle] = useState<string>('');
 
-    useEffect(() => {
-        initialize();
-    }, [initialize]);
+   
 
     const handleSendMessage = useCallback(async (content: string) => {
         await sendMessage(content);
@@ -64,6 +82,14 @@ const ChatPane: FC = () => {
         await renameChat(chatId, newTitle);
         setRenamingChatId(null);
         setNewTitle('');
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -94,7 +120,7 @@ const ChatPane: FC = () => {
                 backgroundSize: '300px 300px',
             }}
         >
-            
+       
             {/* <Box
                 sx={{
                     position: 'absolute',
@@ -110,7 +136,7 @@ const ChatPane: FC = () => {
             >
                 Лехич Playground
             </Box> */}
-
+ 
             <Sheet
                 sx={{
                     minWidth: { xs: '100dvw', md: '350px' },
@@ -149,6 +175,21 @@ const ChatPane: FC = () => {
 
                   
                     <ColorSchemeToggle sx={{ mt: 2, mb: 1, borderRadius: '50%', px: 1.25, boxShadow: 'sm' }} />
+                    <IconButton
+                        size="sm"
+                        variant="plain"
+                        color="neutral"
+                        sx={{
+                            borderRadius: '50%',
+                            boxShadow: 'sm',
+                            mt: 2,
+                            mb: 1,
+                        }}
+                        onClick={() => logoutUser()}
+                    >
+                        <Logout />
+                    </IconButton>
+                
                 </Box>
 
                 <List sx={{ px: 2, gap: 1 }}>
@@ -213,7 +254,7 @@ const ChatPane: FC = () => {
                                     aria-describedby="rename-chat-description"
                                 >
                                     <ModalDialog>
-                                        <Typography id="rename-chat-title" level="h6" mb={2}>
+                                        <Typography id="rename-chat-title" level="body-md" mb={2}>
                                             Rename Chat
                                         </Typography>
                                         <Input
@@ -271,15 +312,15 @@ const ChatPane: FC = () => {
                 }}
               >
               
-              <Dropdown>
+              <Dropdown >
       <MenuButton
         slots={{ root: IconButton }}
         slotProps={{ root: { variant: 'plain', color: 'neutral' } }}
       >
         <MoreVert />
       </MenuButton>
-      <Menu>
-        <MenuItem  onClick={() => clearMessages(currentChat!)}>Clear</MenuItem>
+      <Menu variant="plain" sx={{bgcolor: 'background.surface', py: 0, width: '100px'}}>
+        <MenuItem sx={{color: 'text.secondary', width: '100%'}} onClick={() => clearMessages(currentChat!)}>Очистить</MenuItem>
        
       </Menu>
     </Dropdown>
@@ -339,7 +380,7 @@ const ChatPane: FC = () => {
                 >
                     Save Settings
                 </Button> */}
-               
+           
                 <Tabs aria-label="Settings Tabs" size="sm" defaultValue={0} sx={{ bgcolor: 'transparent' }}>
                     <TabList disableUnderline={true} tabFlex="auto" sx={{
                         mt: 2,
@@ -355,7 +396,7 @@ const ChatPane: FC = () => {
                         <Tab disableIndicator>STT</Tab>
                         <Tab disableIndicator>LLM</Tab>
                         <Tab disableIndicator>TTS</Tab>
-                        <Tab disableIndicator>Asterisk</Tab>
+                        <Tab disableIndicator>     {user?.email}</Tab>
                         {/* Add more tabs if necessary */}
                     </TabList>
                     <TabPanel value={0}>

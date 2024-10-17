@@ -1,12 +1,12 @@
 import React, { FC, useState } from "react";
-import { Box, Button, IconButton, Modal, ModalClose, ModalDialog, Sheet, Stack, Textarea, Typography } from "@mui/joy";
+import { Avatar, Box, Button, IconButton, Modal, ModalClose, ModalDialog, Sheet, Stack, Textarea, Typography } from "@mui/joy";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { darcula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import CustomAudioPlayer from "./CustomAudioPlayer";
 import { Message, Sender } from "../types/types";
 import { Delete, Edit } from "@mui/icons-material";
-import { useStore } from "../store/ChatStore";
+import { useMessageStore } from "../store/MessageStore";
 
 
 
@@ -16,8 +16,9 @@ interface ChatMessageProps {
 }
 
 const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
-    const deleteMessage = useStore((state) => state.deleteMessage);
-    const updateMessage = useStore((state) => state.updateMessage);
+    
+    const deleteMessage = useMessageStore((state) => state.deleteMessage);
+    const updateMessage = useMessageStore((state) => state.updateMessage);
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(message.content);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -68,6 +69,7 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
             }}
         >
             <Stack  sx={{mb: 0.5, display: 'flex', gap:1, alignItems: 'center', flexDirection: message.role === Sender.User ? 'row-reverse' : 'row'}}>
+            <Avatar src={message.role === Sender.User ? "https://optim.tildacdn.com/tild3966-3736-4265-b330-366463373339/-/resize/144x/-/format/webp/1000043341.png" : "https://static.tildacdn.com/tild6533-6335-4231-a134-633961623065/1000043340.png"} alt={message.role === Sender.User ? "User" : "Assistant"} />
             <Typography
                 level="body-xs"
                 sx={{
@@ -92,14 +94,13 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
             >
                 {isEditing ? (
                     <Box>
-                        <Textarea
+                             <Textarea
+                            component="textarea" // Add this line
                             value={editedContent}
-                       
                             onChange={(e) => setEditedContent(e.target.value)}
                             minRows={2}
                             maxRows={6}
-                            fullWidth
-                            sx={{ mb: 2 }}
+                            sx={{ mb: 2, width: '100%' }} // Replace fullWidth with width
                         />
                         <Stack direction="row" spacing={1}>
                             <Button variant="solid" onClick={handleSave}>
@@ -114,7 +115,7 @@ const ChatMessage: FC<ChatMessageProps> = React.memo(({ message }) => {
                     <Typography level="body-md" sx={{ wordWrap: 'break-word' }}>
                         <Markdown
                             components={{
-                                code({ node, inline, className, children, ...props }) {
+                                code({ node, inline, className, children, ...props } ) {
                                     const match = /language-(\w+)/.exec(
                                         className || ""
                                     );

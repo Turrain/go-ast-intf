@@ -14,6 +14,7 @@ export enum Sender {
   }
   
   export interface STTSettings {
+    language: string | null;
     beam_size: number | null;
     best_of: number | null;
     patience: number | null;

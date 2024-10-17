@@ -1,9 +1,10 @@
 import React, { FC, useState } from "react";
 import { Typography, Input, Button, Sheet, Alert, CircularProgress, Switch, Box, Tooltip } from "@mui/joy";
 import { AsteriskSettings } from "../../types/types";
-import { useStore } from "../../store/ChatStore";
+
 import AsteriskAPI from "../../store/AsteriskAPI";
 import { InfoOutlined } from "@mui/icons-material";
+import { useChatStore } from "../../store/ChatStore";
 
 interface AsteriskFormProps {
     chatId: string;
@@ -16,7 +17,7 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const currentChat = useStore((state) => state.currentChat);
+    const currentChat = useChatStore((state) => state.currentChat);
     const handleCall = async () => {
         const endpoint = settings.asterisk_number;
 
@@ -42,8 +43,8 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
 
     return (
         <Sheet
-            color="primary"
-            variant="soft"
+            color="neutral"
+          
             sx={{ p: 1, mt: 2, borderRadius: '18px' }}
         >
           
@@ -146,6 +147,13 @@ const AsteriskForm: FC<AsteriskFormProps> = ({ chatId, settings, onSettingsChang
             </Button>
         </Sheet>
     );
+};
+
+AsteriskForm.defaultProps = {
+    settings: {
+        asterisk_host: null,
+        asterisk_number: null,
+    },
 };
 
 export default AsteriskForm;

@@ -6,6 +6,7 @@ class ChatAPI {
     private static instance: ChatAPI;
     private client: AxiosInstance;
     public socket: Socket;
+    private token: string | null = null;
 
     private constructor(baseURL: string) {
         this.client = axios.create({ baseURL });
@@ -23,9 +24,62 @@ class ChatAPI {
     }
 
     // Users
-    async createUser(username: string, email: string, password: string): Promise<User | undefined> {
+    public setToken(token: string) {
+        this.token = token;
+        this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    public getToken(): string | null {
+        return this.token;
+    }
+    // Users
+    async registerUser(email: string, password: string): Promise<User | undefined> {
         try {
-            const response = await this.client.post('/users', { username, email, password });
+            const response = await this.client.post('/users/register', { email, password });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async loginUser(email: string, password: string): Promise<void> {
+        try {
+            const response = await this.client.post('/users/login', { email, password });
+            this.setToken(response.data.token);
+            
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async logoutUser(): Promise<void> {
+        try {
+            await this.client.post('/users/logout');
+            this.token = null;
+            delete this.client.defaults.headers.common['Authorization'];
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async listUsers(): Promise<User[] | undefined> {
+        try {
+            const response = await this.client.get('/users');
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+    async updateUser(userId: number, data: Partial<User>): Promise<User | undefined> {
+        try {
+            const response = await this.client.put(`/users/${userId}`, data);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+    async getCurrentUser(): Promise<User | undefined> {
+        try {
+            const response = await this.client.get('/users/me');
             return response.data;
         } catch (error) {
             this.handleError(error);
@@ -38,23 +92,8 @@ class ChatAPI {
             this.handleError(error);
         }
     }
-    async listUsers(): Promise<User[] | undefined> {
-        try {
-            const response = await this.client.get('/users');
-            return response.data;
-        } catch (error) {
-            this.handleError(error);
-        }
-    }
+   
 
-    async updateUser(userId: number, data: Partial<User>): Promise<User | undefined> {
-        try {
-            const response = await this.client.put(`/users/${userId}`, data);
-            return response.data;
-        } catch (error) {
-            this.handleError(error);
-        }
-    }
 
     async deleteUser(userId: number): Promise<void> {
         try {
@@ -86,7 +125,9 @@ class ChatAPI {
     async listChats(): Promise<Chat[] | undefined> {
         try {
             const response = await this.client.get('/chats');
+            console.log(response.data)
             return response.data;
+
         } catch (error) {
             this.handleError(error);
         }
