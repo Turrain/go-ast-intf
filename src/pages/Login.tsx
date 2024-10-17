@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/AuthStore';
 import { Box, IconButton, Typography, Stack, Button, Divider, FormControl, FormLabel, Input, Checkbox, tabClasses, TabList, Tab, Tabs, TabPanel } from '@mui/joy';
 import ColorSchemeToggle from '../components/ColorSchemeToggle';
+import ReadmeLogin from '../components/ReadmeLogin';
 
 
 
@@ -179,13 +180,18 @@ const Login: React.FC = () => {
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundImage:
-                        'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
+                        'url(https://www.dallas.edu/wp-content/uploads/2016/11/clean-white-polygon-backgrounds-8-1.jpg)',
                     [theme.getColorSchemeSelector('dark')]: {
                         backgroundImage:
                             'url(https://images.unsplash.com/photo-1572072393749-3ca9c8ea0831?auto=format&w=1000&dpr=2)',
                     },
                 })}
-            />
+            >
+                <Box sx={{ }}>
+                <ReadmeLogin />
+                </Box>
+               
+            </Box>
         </Box>
     );
 };
